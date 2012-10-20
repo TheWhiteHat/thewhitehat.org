@@ -1,0 +1,12 @@
+# Python compiled files
+*.py[cod]
+
+# Virtual environment
+venv
+
+# Development sqlite database
+sqlite3.db
+
+# Editor temp files
+*~
+*.swp
