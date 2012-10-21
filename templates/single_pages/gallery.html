@@ -3,58 +3,40 @@
 {% block title %}Gallery{% endblock %}
 
 {% block body %}
-
-<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
 <div id="fb-root"></div>
-<div id="gallery">
-
-</div>
+<div id="gallery"></div>
 {% endblock %}
+
 {% block scripts %}
-
-<script>
-  window.fbAsyncInit = function() {
-    // init the FB JS SDK
-    FB.init({
-      appId      : '107350029325934', // App ID from the App Dashboard
-      channelUrl : '/static/html/channel.html', // Channel File for x-domain communication
-      status     : true, // check the login status upon init?
-      cookie     : true, // set sessions cookies to allow your server to access the session?
-      xfbml      : true  // parse XFBML tags on this page?
-    });
-
-    // Additional initialization code such as adding Event Listeners goes here
-
-  };
-
-  // Load the SDK's source Asynchronously
-  (function(d){
-     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement('script'); js.id = id; js.async = true;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     ref.parentNode.insertBefore(js, ref);
-   }(document));
-</script>
+<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-FB.api('/polysec/albums',  function(resp) {
-                //Log.info('Albums', resp);
-                var container = "#gallery";
-                for (var i=0, l=resp.data.length; i<l; i++){
-                    var album = resp.data[i];
-                    $(container).append("<div class='row-fluid'><h3>" + album.name + "</h3><ul class='thumbnails' id='" + album.id + "'></ul></div>");
-                    var albumul = "#" + album.id + "";
-                    
-                    FB.api('/' + album.id + '/photos?limit=3', function(resp2){
-                        for(var j = 0, k=resp2.data.length; j<k; j++){
-                            var photo = resp2.data[j];
-                            console.log(photo);
-                            $(albumul).append("<li class='span3'><a class='thumbnail' href='" + photo.images[0].source + "'><img height='200px' src='" + photo.images[2].source + "'/></li>");
-                        }
-                    })
-                }
-            });
-            });
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '107350029325934',
+    channelUrl : '/static/html/channel.html',
+    status     : true,
+    cookie     : true,
+    xfbml      : true
+  });
+};
+
+$(function($) {
+  FB.api('/polysec/albums',  function(res) {
+    var container = '#gallery';
+    for (var i = 0, l = res.data.length; i < l; i++){
+      var album = res.data[i];
+      $(container).append('<div class="row"><h3>' + album.name + '</h3><ul class="thumbnails" id="' + album.id + '"></ul></div>');
+      var albumul = '#' + album.id;
+
+      FB.api('/' + album.id + '/photos?limit=4', function(res){
+        for(var j = 0, k=res.data.length; j<k; j++){
+          var photo = res.data[j];
+          console.log(photo);
+          $(albumul).append('<li class="span3"><a class="thumbnail" href="' + photo.images[0].source + '"><img height="200px" src="' + photo.images[2].source + '"/></li>');
+        }
+      })
+    }
+  });
+});
 </script>
 {% endblock %}
