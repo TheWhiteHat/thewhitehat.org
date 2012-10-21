@@ -6,13 +6,15 @@ from datetime import datetime
 
 # all of the blog posts in order
 def index(request, page=1):
-    return ''
+    entries = Entry.objects.order_by('date_created')[:5]
+
+    return render_to_response('blog/index.html', {'entries':entries})
 
 # view the detail(s) of single entry
 def entry_detail(request, slug):
-    entry = Entry.objects.get(slug=slug)
+    entries = Entry.objects.filter(slug=slug)
     
-    return render_to_response('blog/entry_detail.html', {'entry':entry})
+    return render_to_response('blog/entry_detail.html', {'entries':entries})
 
 # view a list of all entries in time order potentially filtered by
 # author, tag, or category
