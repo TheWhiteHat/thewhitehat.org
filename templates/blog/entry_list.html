@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block body %}
-  {{ list_title }}
   <div id="entry-list">
+    <h1>{{ list_title }}</h1>
     {% for entry in entries %}
       <div class="entry-list-item">
 	<a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
-	<time>{{ entry.date_modified|date:"g:i A l, F d, Y" }}</time>
+	<time>{{ entry.date_modified|date:"l, F d, Y" }}</time>
       </div>
     {% endfor %}
   </div>

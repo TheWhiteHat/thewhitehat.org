@@ -2,7 +2,7 @@
 
 {% block body %}
   {% for entry in entries %}
-    <article>
+    <article class="entry">
       <header>
 	<a href={{ entry.get_absolute_url }}><h1>{{ entry.headline }}</h1></a>
 	<h2>{{ entry.author.username }}</h2>

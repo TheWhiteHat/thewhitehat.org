@@ -21,4 +21,4 @@ def entry_detail(request, slug):
 def entry_list(request):
     entries = Entry.objects.all()
 
-    return render_to_response('blog/entry_list.html', {'entries':entries, 'list_title':'Every Entry'})
+    return render_to_response('blog/entry_list.html', {'entries':entries[::-1], 'list_title':'Every Entry'})
