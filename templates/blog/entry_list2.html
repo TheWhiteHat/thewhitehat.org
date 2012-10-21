@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="hidden">
+{% for entry in entries %}
+    {% ifchanged entry.date_created.month entry.date_created.year %} 
+        </div>
+       <br><h1> New month {{ entry.date_created.month }} - {{ entry.date_created.year }} </h1>
+       <div class="well">
+    {% endifchanged %}
+    <br>
+    {{ entry.headline }} -- {{ entry.slug }} -- {{ entry.date_created }}
+{% endfor %}
+</div>
+{% endblock %}
