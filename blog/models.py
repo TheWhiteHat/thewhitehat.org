@@ -30,7 +30,7 @@ class Entry(models.Model):
     enable_comments = models.BooleanField(default=True)
     tags = models.ManyToManyField(Tag, related_name="entries", db_index=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    date_modifed = models.DateTimeField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return self.headline

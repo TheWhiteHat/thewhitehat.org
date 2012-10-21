@@ -1,0 +1,22 @@
+{% extend "base.html" %}n
+
+{% block body %}
+  <article>
+    <header>
+      <a href={{ entry.get_absolute_url }}><h1>{{ entry.headline }}</h1></a>
+      <h2>{{ entry.author.name }}</h2>
+      <time datetime={{ entry.date }}>{{ entry.date|date "d/m/Y" }}</time>
+    </header>
+
+    <div class="entry-content">
+      {% autoescape off %}
+      {{ entry.content }}
+      {% endautoescape %}
+    </div>
+  </article>
+
+  {% if entry.comments_enabled %}
+    <div class="entry-comments">
+    </div>
+  {% endif %}
+{% endblock body %}
