@@ -1,19 +1,24 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div id="entry-list">
-  <h1>{{ list_title }}</h1>
-  {% for entry in entries %}
-  {% ifchanged entry.date_created.month %}
-  <h3>{{ entry.date_created|date:"F Y" }}</h3>
-  {% endifchanged %}
-  <div class="entry-list-item">
-    <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
-    <time>{{ entry.date_created|date:"d F" }}</time>
+{% regroup entries by date_created.month as date_groups %}
+  <div id="entry-list">
+    {% for group in date_groups %}
+    <div class="entry-date-group">
+      {% for entry in group.list %}
+      {% if forloop.first %}
+      <h3>{{ entry.date_created|date:"Y F" }}</h3>
+      <ol>
+        {% endif %}
+        <li>
+          <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
+	  <time>{{ entry.date_created|date:"F d" }}</time>
+	</li>
+        {% endfor %}
+      </ol>
+      {% endfor %}
+    </div>
   </div>
-  {% endfor %}
-</div>
-
 <!--
 <div id="entry-filter-forms">
   <p>NOTICE: None of this affects anything yet.</p>
