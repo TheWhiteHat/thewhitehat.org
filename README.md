@@ -9,4 +9,5 @@ Get Started
 5. Install the requirements (`pip install Django dj-database-url`)
 6. Create the dev database (`python manage.py syncdb`)
    * create an admin account for yourself when it asks
-7. Run the development server (`python manage.py runserver`)
+7. Load some test data (`python manage.py loaddata test`)
+8. Run the development server (`python manage.py runserver`)
