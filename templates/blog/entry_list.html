@@ -1,36 +1,32 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <div id="entry-list">
-    <h1>{{ list_title }}</h1>
-    {% for group in entries %}
-        {% for entry in group %}
-          {% if forloop.first %}
-            <h3>{{ entry.date_created|date:"F Y" }}</h3>
-	    <div class="entry-list-group">
-	  {% endif %}
-          <div class="entry-list-item">
-	    <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
-	    <time>{{ entry.date_created|date:"d F" }}</time>
-	  </div>
-        {% endfor %}
-      </div>
-    {% endfor %}
+<div id="entry-list">
+  <h1>{{ list_title }}</h1>
+  {% for entry in entries %}
+  {% ifchanged entry.date_created.month %}
+  <h3>{{ entry.date_created|date:"F Y" }}</h3>
+  {% endifchanged %}
+  <div class="entry-list-item">
+    <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
+    <time>{{ entry.date_created|date:"d F" }}</time>
   </div>
+  {% endfor %}
+</div>
 
-  <!--
-  <div id="entry-filter-forms">
-    <p>NOTICE: None of this affects anything yet.</p>
-    <form action="/blog/index" method="POST">
-      <label>Author <input type="text" name="author"></label>
-      <label>Headline <input type="text" name="headline"></label>
-      <div class="date-forms">
-	<label>Older-than <input type="date" name="older-than"></label>
-	<label>Newer-than <input type="date" name="newer-than"></label>
-      </div>
-      <label>Contains <input type="text" name="contains"></label>
-      <input type="submit" value="Apply Filters">
-    </form>
-  </div>
-  -->
+<!--
+<div id="entry-filter-forms">
+  <p>NOTICE: None of this affects anything yet.</p>
+  <form action="/blog/index" method="POST">
+    <label>Author <input type="text" name="author"></label>
+    <label>Headline <input type="text" name="headline"></label>
+    <div class="date-forms">
+      <label>Older-than <input type="date" name="older-than"></label>
+      <label>Newer-than <input type="date" name="newer-than"></label>
+    </div>
+    <label>Contains <input type="text" name="contains"></label>
+    <input type="submit" value="Apply Filters">
+  </form>
+</div>
+-->
 {% endblock body %}
