@@ -7,6 +7,9 @@ venv
 # Development sqlite database
 sqlite3.db
 
+# Collected static files
+static
+
 # Editor temp files
 *~
 *.swp
