@@ -3,10 +3,17 @@
 {% block body %}
   <div id="entry-list">
     <h1>{{ list_title }}</h1>
-    {% for entry in entries %}
-      <div class="entry-list-item">
-	<a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
-	<time>{{ entry.date_modified|date:"l, F d, Y" }}</time>
+    {% for group in entries %}
+        {% for entry in group %}
+          {% if forloop.first %}
+            <h3>{{ entry.date_created|date:"F Y" }}</h3>
+	    <div class="entry-list-group">
+	  {% endif %}
+          <div class="entry-list-item">
+	    <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
+	    <time>{{ entry.date_created|date:"d F" }}</time>
+	  </div>
+        {% endfor %}
       </div>
     {% endfor %}
   </div>

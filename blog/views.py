@@ -19,6 +19,23 @@ def entry_detail(request, slug):
 # view a list of all entries in time order potentially filtered by
 # author, tag, or category
 def entry_list(request):
-    entries = Entry.objects.all()
+    entries = Entry.objects.order_by('-date_created')
 
-    return render_to_response('blog/entry_list.html', {'entries':entries[::-1], 'list_title':'Every Entry'})
+    ## Sort the entries into groups by month. Probably a better way to
+    ## do this
+
+    final = []
+    temp = []
+    curr = entries[0].date_created.month
+
+    for q in entries:
+        d = q.date_created.month
+        if d < curr:
+            curr = d
+            final.append(temp)
+            temp = []
+        temp.append(q)
+
+    final.append(temp)
+
+    return render_to_response('blog/entry_list.html', {'entries':final, 'list_title':'Every Entry'})
