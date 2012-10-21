@@ -2,14 +2,21 @@
 
 {% block body %}
 <div class="hidden">
+<ol>
 {% for entry in entries %}
     {% ifchanged entry.date_created.month entry.date_created.year %} 
+        </ol>
         </div>
-       <br><h1> New month {{ entry.date_created.month }} - {{ entry.date_created.year }} </h1>
+       <br><h3> {{ entry.date_created|date:"Y F"}} </h3>
        <div class="well">
+       <ol>
     {% endifchanged %}
-    <br>
-    {{ entry.headline }} -- {{ entry.slug }} -- {{ entry.date_created }}
+    <li>
+        <a href="{{ entry.get_absolute_url }}">{{ entry.headline }}</a>
+        <time>{{ entry.date_created|date:"F d"}}</time>
+    </li>
+    
 {% endfor %}
+</ol>
 </div>
 {% endblock %}

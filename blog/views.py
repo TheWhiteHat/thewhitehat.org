@@ -20,5 +20,7 @@ def entry_detail(request, slug):
 # author, tag, or category
 def entry_list(request):
     entries = Entry.objects.order_by('-date_created')
-
+    
+    # user entry_list2.html for verybueno's listing technique.
     return render_to_response('blog/entry_list.html', {'entries':entries, 'list_title':'Every Entry'})
+
