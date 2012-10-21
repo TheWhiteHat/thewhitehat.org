@@ -40,3 +40,11 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = 'entries'
+
+# a simple page, that is not a blog, like an 'about us',gallery, etc.
+class Page(models.Model):
+    headline = models.CharField(max_length=126)
+    slug = models.SlugField()
+    content = models.TextField()
+    date_modified = models.DateTimeField(auto_now=True,auto_now_add=True)
+    
