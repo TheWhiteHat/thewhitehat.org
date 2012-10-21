@@ -1,11 +1,12 @@
-{% extend "base.html" %}n
+{% extends "base.html" %}n
 
 {% block body %}
   <article>
     <header>
       <a href={{ entry.get_absolute_url }}><h1>{{ entry.headline }}</h1></a>
       <h2>{{ entry.author.name }}</h2>
-      <time datetime={{ entry.date }}>{{ entry.date|date "d/m/Y" }}</time>
+      <time datetime="{{ entry.date_modified|date:"U" }}">{{ entry.date_modified|date:"g:i A l, F d, Y" }}</time>
+	
     </header>
 
     <div class="entry-content">
