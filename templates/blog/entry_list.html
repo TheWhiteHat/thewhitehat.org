@@ -1,29 +1,37 @@
 {% extends "base.html" %}
 
 {% block body %}
+{% regroup entries by date_created.month as date_groups %}
   <div id="entry-list">
-    <h1>{{ list_title }}</h1>
-    {% for entry in entries %}
-      <div class="entry-list-item">
-	<a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
-	<time>{{ entry.date_modified|date:"l, F d, Y" }}</time>
-      </div>
-    {% endfor %}
+    {% for group in date_groups %}
+    <div class="entry-date-group">
+      {% for entry in group.list %}
+      {% if forloop.first %}
+      <h3>{{ entry.date_created|date:"Y F" }}</h3>
+      <ol>
+        {% endif %}
+        <li>
+          <a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
+	  <time>{{ entry.date_created|date:"F d" }}</time>
+	</li>
+        {% endfor %}
+      </ol>
+      {% endfor %}
+    </div>
   </div>
-
-  <!--
-  <div id="entry-filter-forms">
-    <p>NOTICE: None of this affects anything yet.</p>
-    <form action="/blog/index" method="POST">
-      <label>Author <input type="text" name="author"></label>
-      <label>Headline <input type="text" name="headline"></label>
-      <div class="date-forms">
-	<label>Older-than <input type="date" name="older-than"></label>
-	<label>Newer-than <input type="date" name="newer-than"></label>
-      </div>
-      <label>Contains <input type="text" name="contains"></label>
-      <input type="submit" value="Apply Filters">
-    </form>
-  </div>
-  -->
+<!--
+<div id="entry-filter-forms">
+  <p>NOTICE: None of this affects anything yet.</p>
+  <form action="/blog/index" method="POST">
+    <label>Author <input type="text" name="author"></label>
+    <label>Headline <input type="text" name="headline"></label>
+    <div class="date-forms">
+      <label>Older-than <input type="date" name="older-than"></label>
+      <label>Newer-than <input type="date" name="newer-than"></label>
+    </div>
+    <label>Contains <input type="text" name="contains"></label>
+    <input type="submit" value="Apply Filters">
+  </form>
+</div>
+-->
 {% endblock body %}

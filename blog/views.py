@@ -12,13 +12,13 @@ def index(request, page=1):
 
 # view the detail(s) of single entry
 def entry_detail(request, slug):
-    entries = Entry.objects.filter(slug=slug)
+    entry = Entry.objects.get(slug=slug)
     
-    return render_to_response('blog/entry_detail.html', {'entries':entries})
+    return render_to_response('blog/entry_detail.html', {'entry':entry})
 
 # view a list of all entries in time order potentially filtered by
 # author, tag, or category
 def entry_list(request):
-    entries = Entry.objects.all()
+    entries = Entry.objects.order_by('-date_created')
 
-    return render_to_response('blog/entry_list.html', {'entries':entries[::-1], 'list_title':'Every Entry'})
+    return render_to_response('blog/entry_list.html', {'entries':entries, 'list_title':'Every Entry'})
