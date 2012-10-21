@@ -4,10 +4,11 @@ from django.template import RequestContext
 from blog.models import Entry
 from datetime import datetime
 
+# all of the blog posts in order
 def index(request, page=1):
     return ''
 
-# view a single entry
+# view the detail(s) of single entry
 def entry_detail(request, slug):
     entry = Entry.objects.get(slug=slug)
     
@@ -16,4 +17,6 @@ def entry_detail(request, slug):
 # view a list of all entries in time order potentially filtered by
 # author, tag, or category
 def entry_list(request):
-    return ''
+    entries = Entry.objects.all()
+
+    return render_to_response('blog/entry_list.html', {'entries':entries, 'list_title':'Every Entry'})

@@ -1,18 +1,19 @@
-{% extend "base.html" %}
+{% extends "base.html" %}
 
 {% block body %}
-  {{ index-title }}
-  <div class="entry-index">
-    {% for entry in index %}
-      <div class="entry-index-item">
-	<a href={{ entry.slug }}>{{ entry.headline }}</a>
-	<time>{{ entry.date|date "d/m/Y" }}</time>
+  {{ list_title }}
+  <div id="entry-list">
+    {% for entry in entries %}
+      <div class="entry-list-item">
+	<a href={{ entry.get_absolute_url }}>{{ entry.headline }}</a>
+	<time>{{ entry.date_modified|date:"g:i A l, F d, Y" }}</time>
       </div>
     {% endfor %}
   </div>
 
-  <div id="index-filter-forms">
-    <p>NOTICE: Pretty much none of this affects anything yet</p>
+  <!--
+  <div id="entry-filter-forms">
+    <p>NOTICE: None of this affects anything yet.</p>
     <form action="/blog/index" method="POST">
       <label>Author <input type="text" name="author"></label>
       <label>Headline <input type="text" name="headline"></label>
@@ -24,4 +25,5 @@
       <input type="submit" value="Apply Filters">
     </form>
   </div>
+  -->
 {% endblock body %}
