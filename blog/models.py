@@ -1,13 +1,12 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 
 # an over-arching category for entries. one cat. per entry.
 class Category(models.Model):
     name = models.SlugField()
     description = models.CharField(max_length=126)
-    
+
     def __unicode__(self):
         return self.name
 
@@ -37,8 +36,7 @@ class Entry(models.Model):
         return self.headline
 
     def get_absolute_url(self):
-        return reverse('entry_view',args=(self.slug,)) 
+        return reverse('entry_detail', args=(self.slug,))
 
     class Meta:
         verbose_name_plural = 'entries'
-

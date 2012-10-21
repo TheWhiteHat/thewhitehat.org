@@ -1,6 +1,5 @@
-from django.conf.urls.defaults import *
-from blog.views import *
+from django.conf.urls import patterns, url
 
-urlpatterns=patterns('blog.views',
-    url(r'^(?P<slug>\w+)/*$',entry_view,name="entry_view"),
+urlpatterns = patterns('blog.views',
+    url(r'^(?P<slug>\w+)/?$', 'entry_detail', name="entry_detail"),
 )
