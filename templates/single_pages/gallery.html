@@ -4,7 +4,7 @@
 
 {% block body %}
 <div id="fb-root"></div>
-<div id="gallery"></div>
+<div id="gallery" ></div>
 {% endblock %}
 
 {% block scripts %}
@@ -25,7 +25,7 @@ $(function($) {
     var container = '#gallery';
     for (var i = 0, l = res.data.length; i < l; i++){
       var album = res.data[i];
-      $(container).append('<div class="row"><h3>' + album.name + '</h3><ul class="thumbnails" id="' + album.id + '"></ul></div>');
+      $(container).append('<div> <h3>' + album.name + '</h3><ul class="thumbnails" id="' + album.id + '"></ul></div>');
       var albumul = '#' + album.id;
 
       FB.api('/' + album.id + '/photos?limit=4', function(res){
