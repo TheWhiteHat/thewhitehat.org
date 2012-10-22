@@ -6,13 +6,13 @@ from datetime import datetime
 
 # the top 5 blog posts in order from newest to oldest
 def index(request, page=1):
-    entries = Entry.objects.order_by('-date_created')[:5]
+    entries = Entry.objects.order_by('-date_created').select_related()[:5]
 
     return render(request, 'blog/index.html', {'entries':entries})
 
 # view the detail(s) of single entry
 def entry_detail(request, slug):
-    entry = Entry.objects.get(slug=slug)
+    entry = Entry.objects.select_related().get(slug=slug)
     
     return render(request, 'blog/entry_detail.html', {'entry':entry})
 
