@@ -7,6 +7,10 @@ class Category(models.Model):
     name = models.SlugField()
     description = models.CharField(max_length=126)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('category_entry_list', (self.name,))
+
     def __unicode__(self):
         return self.name
 
@@ -16,6 +20,10 @@ class Category(models.Model):
 # a more specific categorization for entries. multiple tags per entry.
 class Tag(models.Model):
     name = models.SlugField()
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('tag_entry_list', (self.name,))
 
     def __unicode__(self):
         return self.name

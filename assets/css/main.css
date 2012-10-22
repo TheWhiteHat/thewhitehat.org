@@ -1,0 +1,14 @@
+.entry > header > h3 {
+  font-variant: small-caps;
+}
+.entry > header > h4 {
+  font-family: 'Anonymous Pro';
+}
+time {
+  color: #999;
+  font-family: 'Anonymous Pro';
+}
+
+footer {
+  margin: 40px 0 20px;
+}

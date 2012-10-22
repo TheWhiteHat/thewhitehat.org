@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block body %}
+{% block title %}Blog{% endblock %}
 
+{% block body %}
 {% for entry in entries %}
+{% if not forloop.first %}<hr>{% endif %}
 {% include "blog/entry.html" %}
 {% endfor %}
-
 {% endblock body %}

@@ -1,11 +1,11 @@
 <article class="entry">
   <header>
-    <a href={{ entry.get_absolute_url }}><h1>{{ entry.headline }}</h1></a>
-    <h2>{{ entry.author.username }}</h2>
-    <time datetime="{{ entry.date_modified|date:"U" }}">
-      {{ entry.date_modified|date:"g:i A l, F d, Y" }}
-    </time>
-
+    <h3><a href="{{ entry.get_absolute_url }}">{{ entry.headline }}</a></h3>
+    <h4><a href="{% url author_entry_list entry.author %}">{{ entry.author.username }}</a>
+      &laquo; <time datetime="{{ entry.date_modified|date:"U" }}">
+        {{ entry.date_modified|date:"g:i A l, F d, Y" }}
+      </time>
+    </h4>
   </header>
 
   <div class="entry-content">
