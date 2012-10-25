@@ -4,10 +4,13 @@
 <div class="container">
   <div class="row">
     <div class="span8">
-      BLOG POSTS YEAH
+      {% for entry in entries %}
+      {% if not forloop.first %}<hr>{% endif %}
+      {% include "blog/entry.html" %}
+      {% endfor %}
     </div>
     <div class="span4">
-      fuckin sidebar with social shit
+      sidebar with social stuff
     </div>
   </div>
 </div>
