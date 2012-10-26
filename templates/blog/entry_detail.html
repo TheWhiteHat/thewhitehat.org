@@ -17,7 +17,9 @@
     </ul>
   </div>
 </div>
-{% if entry.comments_enabled %}
-<div class="entry-comments"></div>
+{% if entry.enable_comments %}
+<div class="entry-comments">
+  <div class="fb-comments" data-href="http://thewhitehat.org{{ entry.get_absolute_url  }}" data-num-posts="10" data-width="630"></div>
+</div>
 {% endif %}
 {% endblock body %}
