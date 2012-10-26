@@ -31,7 +31,7 @@ class Tag(models.Model):
 # a blog entry
 class Entry(models.Model):  
     headline = models.CharField(max_length=126)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
     author = models.ForeignKey(User, db_index=True)
     category = models.ForeignKey(Category, related_name="entries", db_index=True)
     content = models.TextField()
