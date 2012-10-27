@@ -34,6 +34,7 @@ def entry_list(request, **kwargs):
         limitby = 'tagged ' + kwargs['tag']
     else:
         title = 'Archive'
+        limitby = None
     
     # user entry_list2.html for verybueno's listing technique.
     return render(request, 'blog/entry_list.html', {'entries':entries, 'title':title, 'limitby':limitby})
