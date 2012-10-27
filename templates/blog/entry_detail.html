@@ -8,11 +8,11 @@
 {% include "blog/entry.html" %}
   </div>
   <div class="span2">
-    <h5>Category: <a href="{{ entry.category.get_absolute_url }}">{{ entry.category }}</a></h5>
+    <h5>Category: <a href="{{ entry.category.get_absolute_url }}">{{ entry.category|capfirst }}</a></h5>
     <h5>Tags:</h5>
     <ul>
       {% for tag in entry.tags.all %}
-      <li><a href="{{ tag.get_absolute_url }}">{{ tag }}</a></li>
+      <li><a href="{{ tag.get_absolute_url }}">{{ tag|capfirst }}</a></li>
       {% endfor %}
     </ul>
   </div>
