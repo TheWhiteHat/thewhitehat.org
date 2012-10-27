@@ -4,20 +4,27 @@
 
 {% block body %}
 {% regroup entries by date_created|date:"F Y" as months %}
-<div id="entry-archive">
+<div id="entry-archive" class="row">
+  <div class="span12">
+  {% if limitby %}<h5>All posts {{ limitby }}</h5>{% endif %}
   {% for month in months %}
-  <div class="entry-archive-month">
+  {# <div class="entry-archive-month"> #}
     <h3>{{ month.grouper }}</h3>
-    <ul>
+    <ul class="row">
       {% for entry in month.list %}
-      <li>
-        <time datetime="{{ entry.date_created|date:"Y-m-d" }}">{{ entry.date_created|date:"d M Y" }}</time>
-        &raquo; <a href="{{ entry.get_absolute_url }}">{{ entry.headline }}</a>
-      </li>
+      <div class="span3"> 
+        <div class="well well-small">
+          <a href="{{ entry.get_absolute_url }}">{{ entry.headline }}</a>
+          <div class="align-right"> 
+            <time datetime="{{ entry.date_created|date:"Y-m-d" }}">{{ entry.date_created|date:"d M Y" }}</time>
+          </div>
+          {# &raquo; #} 
+        </div>
+      </div>
       {% endfor %}
     </ul>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
 <!--
 <div id="entry-filter-forms">

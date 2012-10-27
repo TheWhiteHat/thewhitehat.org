@@ -3,8 +3,28 @@
 {% block title %}Blog{% endblock %}
 
 {% block body %}
-{% for entry in entries %}
-{% if not forloop.first %}<hr>{% endif %}
-{% include "blog/entry.html" %}
-{% endfor %}
+<div class="row">
+  <div class="span10">
+    {% for entry in entries %}
+    {% if not forloop.first %}<hr>{% endif %}
+    {% include "blog/entry.html" %}
+    {% endfor %}
+  </div>
+  <div class="span2">
+    <h4><a href="/blog/archive">Archive</a></h4>
+    <h5>Categories</h5>
+    <ul>
+      {% for category in categories %}
+      <li><a href="{{ category.get_absolute_url }}">{{ category|capfirst }}</a></li>
+      {% endfor %}
+    </ul>
+    <h5>Tags</h5>
+    <ul>
+      {% for tag in tags %}
+      <li><a href="{{ tag.get_absolute_url }}"a>{{ tag|capfirst }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
 {% endblock body %}
+
