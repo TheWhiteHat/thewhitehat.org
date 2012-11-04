@@ -3,14 +3,29 @@
 {% block body %}
 <div class="container">
   <div class="row">
-    <div class="span8">
+    <div class="span10">
       {% for entry in entries %}
-      {% if not forloop.first %}<hr>{% endif %}
-      {% include "blog/entry.html" %}
+      {# {% if not forloop.first %}<hr>{% endif %} #}
+      {% if forloop.counter <= 3 %}
+      <div id="{{ entry.slug }}">
+        {% include "blog/entry.html" %}
+      </div>
+      {% endif %}
       {% endfor %}
     </div>
-    <div class="span4">
-      <p>Social stuff</p>
+    <div class="span2">
+      <h3>Latest Posts</h3>
+      <ul>
+        {% for entry in entries %}
+        <li>
+        {% if forloop.counter <= 3 %}
+        <a href={{ "#"|add:entry.slug }}>{{ entry.headline }}</a>
+        {% else %}
+        <a href={{ "blog/"|add:entry.slug }}>{{ entry.headline }}</a>
+        {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
 </div>
