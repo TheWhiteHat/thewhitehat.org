@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from auth.models import User
 
 # an over-arching category for entries. one cat. per entry.
 class Category(models.Model):
