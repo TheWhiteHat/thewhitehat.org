@@ -58,8 +58,8 @@ class User(AbstractBaseUser):
     )
 
     username = models.CharField(max_length=42, unique=True, db_index=True)
-    fbid = models.CharField(max_length=126, null=True, unique=True, db_index=True)
-    email = models.EmailField(null=True)
+    fbid = models.CharField(max_length=126, blank=True, db_index=True)
+    email = models.EmailField(blank=True)
     role = models.SmallIntegerField(choices=ROLE_CHOICES, default=NORMAL)
     use_gravatar = models.BooleanField(default=False)
 
