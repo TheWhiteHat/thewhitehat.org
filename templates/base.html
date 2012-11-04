@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <link rel="shortcut icon" href="/static/favicon.ico" />
-    <title>{% block title %}{% endblock %} | The White Hat - Cal Poly San Luis Obispo</title>
+    <title>{% block title %}{{ title }}{% endblock %} | The White Hat - Cal Poly San Luis Obispo</title>
 
     <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -44,9 +44,9 @@
           <a class="brand" href="/">The White Hat</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="{% url blog %}">Blog</a></li>
-              <li><a href="{% url gallery %}">Gallery</a></li>
-              <li><a href="{% url contact %}">Contact</a></li>
+              <li><a href="{% url 'blog' %}">Blog</a></li>
+              <li><a href="{% url 'gallery' %}">Gallery</a></li>
+              <li><a href="{% url 'contact' %}">Contact</a></li>
               <li><a href="#">Link</a></li>
               <li><a href="#">Link</a></li>
             </ul>

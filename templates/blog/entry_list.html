@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }}{% endblock %}
-
 {% block body %}
 {% regroup entries by date_created|date:"F Y" as months %}
 <div id="entry-archive" class="row">

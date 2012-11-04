@@ -15,7 +15,7 @@
 </ul>
 </div>
 <div class="span10" >
-<form class="well"  action="{% url contact %}" method="post">{% csrf_token %}
+<form class="well"  action="{% url 'contact' %}" method="post">{% csrf_token %}
   <legend>Message Us</legend>
 {% for field in form %}
     {% for error in field.errors %}

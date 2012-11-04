@@ -1,7 +1,7 @@
 <article class="entry">
   <header>
     <h3><a href="{{ entry.get_absolute_url }}">{{ entry.headline }}</a></h3>
-    <h4><a href="{% url author_entry_list entry.author %}">{{ entry.author.username }}</a>
+    <h4><a href="{% url 'author_entry_list' entry.author %}">{{ entry.author.username }}</a>
       &laquo; <time datetime="{{ entry.date_modified|date:"U" }}">
         {{ entry.date_modified|date:"g:i A l, F d, Y" }}
       </time>

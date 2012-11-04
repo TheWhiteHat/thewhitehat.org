@@ -1,5 +1,6 @@
 # Django settings for wh3 project.
 import dj_database_url
+import django.template
 
 import os.path
 PROJECT_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.normpath(__file__)), '..')) # wh3/..
@@ -102,6 +103,9 @@ INSTALLED_APPS = (
 
     'blog','contact',
 )
+
+# allow {% unl 'something' %} inside of templates
+django.template.add_to_builtins('django.templatetags.future')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
