@@ -87,7 +87,7 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         return self.is_staff # todo change this to limit perms for writers and mods
 
-    def has_module_perms(self):
+    def has_module_perms(self, mod):
         return self.is_staff # also change like ^
 
 
