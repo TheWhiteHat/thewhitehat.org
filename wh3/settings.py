@@ -7,7 +7,7 @@ PROJECT_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.normpath(__
 def proj_rel(path):
     return os.path.realpath(os.path.join(PROJECT_ROOT, path)) # PROJECT_ROOT/path
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = 'whauth.User'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -103,7 +103,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'auth', 'blog','contact',
+    'whauth', 'blog','contact',
 )
 
 # allow {% unl 'something' %} inside of templates

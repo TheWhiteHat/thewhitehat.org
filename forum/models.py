@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from blog.models import Category,Tag
-from django.contrib.auth.models import User
+from whauth import User
 
 class Question(models.Model):
     question = models.CharField(max_length=126)
