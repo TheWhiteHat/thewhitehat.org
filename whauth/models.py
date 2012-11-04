@@ -78,11 +78,11 @@ class User(AbstractBaseUser):
 
     @property
     def is_staff(self):
-        return self.role > NORMAL
+        return self.role > self.NORMAL
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.role == self.ADMIN
 
     def has_perm(self, perm, obj=None):
         return self.is_staff # todo change this to limit perms for writers and mods

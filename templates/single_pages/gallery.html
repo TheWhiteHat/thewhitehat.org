@@ -10,31 +10,38 @@
 <script type="text/javascript">
 window.fbAsyncInit = function() {
   FB.init({
-    appId      : '107350029325934',
+    appId      : '371693949580281',
     channelUrl : '/static/html/channel.html',
     status     : true,
     cookie     : true,
     xfbml      : true
   });
-};
-
-$(function($) {
   FB.api('/polysec/albums',  function(res) {
-    var container = '#gallery';
-    for (var i = 0, l = res.data.length; i < l; i++){
+    var contents = [];
+    for (var i = 0, albumlen = res.data.length; i < albumlen; i++) {
       var album = res.data[i];
-      $(container).append('<div> <h3>' + album.name + '</h3><ul class="thumbnails" id="' + album.id + '"></ul></div>');
-      var albumul = '#' + album.id;
+      contents.push('<div><h3>');
+      contents.push(album.name);
+      contents.push('</h3><ul class="thumbnails" id="album-');
+      contents.push(album.id);
+      contents.push('">');
+      contents.push('</ul></div>');
+      $('#gallery').append(contents.join(''));
 
-      FB.api('/' + album.id + '/photos?limit=4', function(res){
-        for(var j = 0, k=res.data.length; j<k; j++){
+      FB.api('/' + album.id + '/photos?limit=4', function(res) {
+        var contents = [];
+        for(var j = 0, photolen = res.data.length; j < photolen; j++) {
           var photo = res.data[j];
-          console.log(photo);
-          $(albumul).append('<li class="span3"><a class="thumbnail" href="' + photo.images[0].source + '"><img height="200px" src="' + photo.images[2].source + '"/></li>');
+          contents.push('<li class="span3"><a class="thumbnail" href="');
+          contents.push(photo.images[0].source);
+          contents.push('"><img height="200px" src="');
+          contents.push(photo.images[2].source);
+          contents.push('"/></li>');
         }
-      })
+        $('#album-'+album.id).html(contents.join(''));
+      });
     }
   });
-});
+};
 </script>
 {% endblock %}
