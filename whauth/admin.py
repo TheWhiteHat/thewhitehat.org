@@ -29,7 +29,7 @@ class UserCreationForm(forms.ModelForm):
         return user
 
 class UserChangeForm(forms.ModelForm):
-    password = ReadOnlyPasswordHashField()
+    # password = ReadOnlyPasswordHashField()
 
     class Meta:
         model = User
@@ -39,20 +39,18 @@ class UserAdmin(DjangoUserAdmin):
     add_form = UserCreationForm
 
     # username, fbid, email, role, use_gravatar
-    list_display = ('username', 'fbid', 'email', 'role', 'use_gravatar')
+    list_display = ('username', 'email', 'role')
     list_filter = ('role',)
+    
     fieldsets = (
-            (None, {
-                'fields': ('email', 'password')
-                }),
-            ('Personal Info', {
-                'classes': ('collapse',),
-                'fields': ('role', 'use_gravatar')},)
-            )
-    #add_fieldsets = (
-    #    (None, {
-    #        'fields': ('email', 'password1', 'password2')}),
-    #)
+        ('Profile', {'fields': ('username', 'email', 'role', 'use_gravatar')}),
+    )
+
+    add_fieldsets = (
+        ('Profile', {
+            'fields': ('username', 'password1', 'password2')}),
+        ('Permissions', {'fields' : ('role',)}),
+    )
     search_fields = ('username',)
     ordering = ('role',)
     filter_horizontal = () 
