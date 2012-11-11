@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from blog.models import Entry, Tag, Category
 from datetime import datetime
@@ -8,13 +8,13 @@ from datetime import datetime
 def index(request, page=1):
     entries = Entry.objects.order_by('-date_created').select_related()[:5]
 
-    return render(request, 'blog/index.html', {'entries':entries, 'categories':Category.objects.all(), 'tags':Tag.objects.all()})
+    return render_to_response('blog/index.html', {'entries':entries, 'categories':Category.objects.all(), 'tags':Tag.objects.all()},context_instance=RequestContext(request))
 
 # view the detail(s) of single entry
 def entry_detail(request, slug):
     entry = Entry.objects.select_related().get(slug=slug)
     
-    return render(request, 'blog/entry_detail.html', {'entry':entry})
+    return render_to_response('blog/entry_detail.html', {'entry':entry},context_instance=RequestContext(request))
 
 # view a list of all entries in time order potentially filtered by
 # author, tag, or category
@@ -37,5 +37,5 @@ def entry_list(request, **kwargs):
         limitby = None
     
     # user entry_list2.html for verybueno's listing technique.
-    return render(request, 'blog/entry_list.html', {'entries':entries, 'title':title, 'limitby':limitby})
+    return render_to_response('blog/entry_list.html', {'entries':entries, 'title':title, 'limitby':limitby},context_instance=RequestContext(request))
 

@@ -22,6 +22,7 @@
   <body>
     <div id="fb-root"></div>
     <script>
+    /*
       (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
@@ -29,12 +30,21 @@
         js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
+      */
     </script>
     <div class="container">
       <header>
         <a href="/"><img src="{% static 'img/logo350x100.png' %}" width="350" height="100" alt="The White Hat - Cal Poly San Luis Obispo" /></a>
-
+      <!--
         <div class="pull-right"><div class="fb-login-button" data-show-faces="true" data-width="200" data-max-rows="1"></div>
+        -->
+        <div class="pull-right">
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+        </div>
       </header>
       <div class="navbar">
         <div class="navbar-inner">
@@ -68,5 +78,4 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js"></script>
     {% block scripts %}{% endblock %}
-  </body>
-</html>
+  </body> </html>
