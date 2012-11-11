@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Logged int{% endblock %}
+{{ at }}
+{% block body %}
+{% if user.is_authenticated %}
+<h1>Logged in!</h1>
+<p>You have successfully logged in.</p>
+{% else %}
+<h1>MOOOOOO</h1>
+<p>What a hacker you are</p>
+{% endif %}
+{% endblock %}
