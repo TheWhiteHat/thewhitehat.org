@@ -8,7 +8,9 @@ def proj_rel(path):
     return os.path.realpath(os.path.join(PROJECT_ROOT, path)) # PROJECT_ROOT/path
 
 AUTH_USER_MODEL = 'whauth.User'
-
+AUTHENTICATION_BACKENDS = (
+        'whauth.backends.AuthBackend',
+        )
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

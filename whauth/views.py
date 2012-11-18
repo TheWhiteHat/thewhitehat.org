@@ -17,9 +17,10 @@ def login(request):
             user = f.authenticate(token=token)
 
             if user:
-                return HttpResponseRedirect('/') # to a logged in page
+                djlogin(request,user)
+                return HttpResponseRedirect('/fbloggedin') # to a logged in page
             else:
-                return HttpResponseRedirect('/') # to a fb login error page
+                return HttpResponseRedirect('/fbloginerror') # to a fb login error page
 
     elif request.method == "POST":
         username = request.POST['username']
@@ -31,9 +32,9 @@ def login(request):
         
         if user:
             djlogin(request,user)
-            return HttpResponseRedirect('/') # to a logged in page
+            return HttpResponseRedirect('/regloggedin') # to a logged in page
         else:
-            return HttpResponseRedirect('/') # to a login error page
+            return HttpResponseRedirect('/reglogerror') # to a login error page
             
     return render_to_response('auth/login.html', context_instance=RequestContext(request))
 

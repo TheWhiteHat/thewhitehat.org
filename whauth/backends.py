@@ -1,6 +1,7 @@
 from django.conf import settings
 from whauth.models import User
 from django.contrib.auth import authenticate as djauth
+from django.contrib.auth import login as djlogin
 
 class AuthBackend:
     
@@ -28,11 +29,20 @@ class AuthBackend:
             except:
                 return None
 
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
             return user
         
         #if token ain't provided, login normally.
-        return djauth(username=username,password=password)
+        try:
+            user = User.objects.get(username=username)
+        except:
+            return None
 
+        if not user.check_password(password):
+            return None
+
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        return user
    
     def get_user(self, user_id):
 
