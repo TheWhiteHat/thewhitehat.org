@@ -3,9 +3,12 @@ import dj_database_url
 import django.template
 
 import os.path
-PROJECT_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.normpath(__file__)), '..')) # wh3/..
+
+PROJECT_ROOT = os.path.realpath(os.path.join(os.path.dirname(os.path.normpath(__file__)), '..'))  # wh3/..
+
+
 def proj_rel(path):
-    return os.path.realpath(os.path.join(PROJECT_ROOT, path)) # PROJECT_ROOT/path
+    return os.path.realpath(os.path.join(PROJECT_ROOT, path))  # PROJECT_ROOT/path
 
 AUTH_USER_MODEL = 'whauth.User'
 AUTHENTICATION_BACKENDS = (
@@ -36,7 +39,7 @@ TIME_ZONE = 'America/Los_Angeles'
 
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
-USE_I18N = False # not needed
+USE_I18N = False  # not needed
 USE_L10N = True
 USE_TZ = True
 
@@ -105,7 +108,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'whauth', 'blog','contact',
+    'whauth',
+    'blog',
+    'contact',
 )
 
 # allow {% unl 'something' %} inside of templates

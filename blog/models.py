@@ -2,6 +2,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from whauth.models import User
 
+
 # an over-arching category for entries. one cat. per entry.
 class Category(models.Model):
     name = models.SlugField()
@@ -17,6 +18,7 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = 'categories'
 
+
 # a more specific categorization for entries. multiple tags per entry.
 class Tag(models.Model):
     name = models.SlugField()
@@ -28,8 +30,9 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
+
 # a blog entry
-class Entry(models.Model):  
+class Entry(models.Model):
     headline = models.CharField(max_length=126)
     slug = models.SlugField(unique=True)
     author = models.ForeignKey(User, db_index=True)
@@ -48,4 +51,3 @@ class Entry(models.Model):
 
     class Meta:
         verbose_name_plural = 'entries'
-
