@@ -14,7 +14,8 @@ footer {
 }
 
 .entry-content > h2 {
-    font-size: 20px;
+    font-family: 'Anonymous Pro';
+    font-size: 24px;
 }
 
 .entry-comments {
