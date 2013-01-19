@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from forum.models import Question
+from django.shortcuts import render, get_object_or_404
+from forum.models import Question, Answer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # the index for the forum page.
@@ -26,5 +26,12 @@ def question_index(request,page_number, **kwargs):
         q_list = paginator.page(paginator.num_pages)
     return render(request,'forum/question/index.html',{'questions':q_list})
 
-def view_question(request,qid):
-    
+# displays a question and its respective answers given a question id.
+def question_detail(request,qid):
+    question = get_object_or_404(Question,id=qid)
+    answers = Answer.objects.select_related().get(question=question)
+    return render(request, 'form/question/question.html',{'question':question,'answers':answers})
+
+# handles a vote for a question
+def handle_vote_question(request):
+    if request.user.can_vote_item(direction=
