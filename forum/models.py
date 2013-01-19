@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from blog.models import Category, Tag
-from whauth import User
+from whauth.models import User
 
 
 class Question(models.Model):

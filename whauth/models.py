@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
 from django.conf import settings
 
-#error raised when login error
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **other_fields):
         if not username:
@@ -51,8 +50,7 @@ class User(AbstractBaseUser):
     ADMIN = 4
 
     ROLE_CHOICES = (
-        (BANNED, 'banned'),
-        (INACTIVE, 'inactive'),
+        (BANNED, 'banned'), (INACTIVE, 'inactive'),
         (NORMAL, 'normal'),
         (WRITER, 'writer'),
         (MOD, 'moderator'),

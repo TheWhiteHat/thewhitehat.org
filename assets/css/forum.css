@@ -1,0 +1,52 @@
+.tag-bar{   
+    background-color:#BBD8E9;
+}
+.cat-block{
+    background-color:#D7E8F7;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 0px 1px #CECECE;
+    -webkit-box-shadow: 0px 0px 0px 1px #CECECE;
+}
+.latest-block{
+    margin-top:20px;
+    background-color: whiteSmoke;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    padding: 5px;
+    box-shadow: 0px 0px 0px 1px #CECECE;
+    -webkit-box-shadow: 0px 0px 0px 1px #CECECE;
+}
+.tag-label{
+    text-shadow: 0 1px 0 #E6F2FA;
+background: #B6DBF5;
+background: -khtml-gradient(linear, left top, left bottom, from(#D7ECFA), to(#B6DBF5));
+background: -webkit-gradient(linear, left top, left bottom, from(#D7ECFA), to(#B6DBF5));
+background: -webkit-linear-gradient(top, #D7ECFA 0%, #B6DBF5 100%);
+background: -moz-linear-gradient(center top, #D7ECFA, #B6DBF5);
+background: -ms-linear-gradient(top, #D7ECFA 0%, #B6DBF5 100%);
+background: -o-linear-gradient(top, #D7ECFA 0%, #B6DBF5 100%);
+background: linear-gradient(top, #D7ECFA 0%, #B6DBF5 100%);
+            font-family: 'Lucida Grande',Lucida,Arial,sans-serif;
+border: 1px solid #8FC0E0;
+cursor: pointer;
+display: inline-block;
+         font-size: 10px;
+         line-height: 12px;
+padding: 2px 5px;
+         -moz-border-radius: 4px;
+         -webkit-border-radius: 4px;
+         border-radius: 4px;
+         -moz-background-clip: padding-box;
+         -webkit-background-clip: padding-box;
+         background-clip: padding-box;
+color: #468AB8;
+}
+.tag-label input{
+    line-height: 20px;
+    margin: 0px 4px 0px 0px;
+    height: 20px;
+}

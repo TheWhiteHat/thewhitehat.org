@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url(r'^gallery/?', TemplateView.as_view(template_name='single_pages/gallery.html'), name='gallery'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^log', include('whauth.urls')),
+    url(r'^forum/', include('forum.urls')),
 )
