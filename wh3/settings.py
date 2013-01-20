@@ -111,6 +111,7 @@ INSTALLED_APPS = (
     'whauth',
     'blog',
     'contact',
+    'forum',
 )
 
 # allow {% unl 'something' %} inside of templates

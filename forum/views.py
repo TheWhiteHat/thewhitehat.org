@@ -34,4 +34,5 @@ def question_detail(request,qid):
 
 # handles a vote for a question
 def handle_vote_question(request):
-    if request.user.can_vote_item(direction=
+    pass
+    #if request.user.can_vote_item(direction=

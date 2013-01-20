@@ -90,4 +90,7 @@ class User(AbstractBaseUser):
     def has_module_perms(self, mod):
         return self.is_staff # also change like ^
 
-
+    # forum-specific functions:
+    def can_vote_on_item(item,direction):
+       pass 
+    # end forum-specifc functions
