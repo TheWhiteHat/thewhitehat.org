@@ -91,6 +91,39 @@ class User(AbstractBaseUser):
         return self.is_staff # also change like ^
 
     # forum-specific functions:
-    def can_vote_on_item(item,direction):
-       pass 
+
+    class CannotVote(Exception):
+        pass
+
+    class AlreadyVoted(Exception):
+        pass
+    
+    # vote on an a given object.    
+    def vote_on_object(self,obj,direction):
+        from forum.models import Vote
+        try:
+            vote = obj.votes.get(user=self) 
+            if vote.direction == direction:
+                raise self.AlreadyVoted()
+            else:
+                vote.direction = direction
+                vote.save()
+                if direction == 'up':
+                    obj.downvotes-=1
+                    obj.upvotes+=1
+                else:
+                    obj.upvotes-=1
+                    obj.downvotes+=1
+                obj.save()
+        except AttributeError:
+            raise self.CannotVote()
+
+        except Vote.DoesNotExist:
+            vote = Vote(direction=direction,content_object=obj,user=self) 
+            vote.save() 
+            if direction == 'up':
+                obj.upvotes+=1
+            else:
+                obj.downvotes+=1
+            obj.save()
     # end forum-specifc functions

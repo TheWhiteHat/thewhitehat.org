@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ question.question_text }}{% endblock %}
+{% block head %}
+<script>
+function post(msg){
+    console.log("posting...");
+    $.ajax({
+      type: "POST",
+      url: "/forum/question/vote/",
+      data: {
+        csrfmiddlewaretoken: '{{ csrf_token }}',
+        objid: "{{ question.id }}", 
+        objtype: "question", 
+        dir:msg,
+      }
+    }).done(function( msg ) {
+        var response = jQuery.parseJSON(msg);
+        if (response.success == false){
+            $("#message").html("error: "+response.reason);
+        }else{
+            $("#message").html("success: "+response.message);
+        }
+    });
+
+}
+</script>
+{% endblock head %}
+
+{% block body %}
+<p>{{ question.question_text }}</p>
+<p>downvotes: {{ question.downvotes }}</p>
+<p>upvotes: {{ question.upvotes }}</p>
+<p id="message"></p>
+<p><a onclick="post('up');">upvote</a>
+<p><a onclick="post('down');">downvote</a>
+{% csrf_token %}
+{% endblock body %}

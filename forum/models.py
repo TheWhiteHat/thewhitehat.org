@@ -1,10 +1,10 @@
 from django.db import models
 from django.core.urlresolvers import reverse
 from blog.models import Category, Tag
-from whauth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.template.defaultfilters import slugify
+from whauth.models import User
 import datetime
 
 class Vote(models.Model):
@@ -21,12 +21,14 @@ class Votable(models.Model):
     votes = generic.GenericRelation(Vote,null=True)
     abstract = True
 
-    def vote(self,direction):
+    def vote(self, direction, user):
         if direction == 'up':
             self.upvotes+=1
-        if direction == 'down':
-            self.downvotes-=1
+        elif direction == 'down':
+            self.downvotes+=1
         self.save()
+        vote = Vote(direction=direction,content_object=self,user=user)
+        vote.save()
 
 class Question(Votable):
     question_text = models.CharField(max_length=126)
@@ -48,7 +50,7 @@ class Question(Votable):
     def save(self, *args, **kwargs):
         if not self.id:
             now = datetime.datetime.now()
-            self.slug = self.slug[0:37]+now.strftime("%m%d%Y%M%S")
+            self.slug = slugify(self.question_text)[0:37]+now.strftime("%m%d%Y%M%S")
         super(Question, self).save(*args, **kwargs)
 
 
@@ -68,5 +70,3 @@ class AnswerComment(models.Model):
 
     def __unicode__(self):
         return self.author.username + " to " + self.answer.question.id
-
-
