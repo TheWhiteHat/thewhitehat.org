@@ -28,7 +28,7 @@ def question_index(request,page_number, **kwargs):
         q_list = paginator.page(1)
     except EmptyPage:
         q_list = paginator.page(paginator.num_pages)
-    return render(request,'forum/question/index.html',{'questions':q_list})
+    return render(request,'forum/question/question_list.html',{'questions':q_list})
 
 # displays a question and its respective answers given a question id.
 def question_detail(request,slug):
@@ -55,9 +55,10 @@ def json_success(msg):
     json_success = {'success':True,'message':msg}
     return HttpResponse(json.dumps(json_success))
 
-# handles a vote from JSON
-@login_required
+# handles a vote from ajax
 def handle_vote(request):
+    if not request.user.is_authenticated():
+        return json_error("user_not_logged_in")
     if request.method == 'POST':
         object_id = object_type = direction = None
         try:

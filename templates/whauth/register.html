@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="span12 well">
+        <h1>Register</h1>
+        <p>
+        <span id="fbregister">
+            <a href="#" class="btn btn-info" onclick="dropdownusername();">Sign Up With Facebook!</a>
+            <span id="fbinput" style="display:none;">
+                <label for="fb_username">Desired username:</label>
+                <input id="fb_username" type="text" name="username" maxlength="42" /><br />
+                <a href="#" class="btn" onclick="register();">Register</a>
+            </span>
+        </span>
+        </p>
+        <p>Or use the form below to enter your info:</p>
+        <form action="{% url 'register' %}" method="post">{% csrf_token %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <div class="alert alert-error">{{ error }}</div>
+                {% empty %}
+            {% endfor %}
+            {{ field.label_tag }}
+            {{ field }}
+        {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn" onclick="register();">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock body %}
+{% block scripts %}
+<script type="text/javascript">
+function post(tok){
+    return  $.ajax({
+        type: "POST",
+        url: "{% url 'register' %}",
+        async: false,
+        cache: false,
+        timeout: 30000,
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            fbtoken:tok,
+            username:$("#fb_username").val(),
+        },
+        success: function( msg ) {
+            var response = jQuery.parseJSON(msg);
+            if (response.success == false){
+              if(typeof(response.reason.fbtoken) != undefined){
+                  $("#fbregister").append("<p class='alert alert-error'>"+response.reason.fbtoken[0]+"</p>");  
+              }
+              if(typeof(response.reason.username) != undefined){
+                  $("#fbregister").append("<p class='alert alert-error'>"+response.reason.username[0]+"</p>");  
+              }
+            }else{
+              $("#fbregister").html("<p class='alert alert-success'>Successfully registered. Please <a href='{% url 'login' %}'>login to continue.</a></p>");  
+            }
+        },
+        error: function( msg ){
+          $("#fbregister").html("<p class='alert alert-error'>There was a server error :(</p>");  
+        },
+    });
+}
+function fblogin(){
+    FB.login(function(response) {
+        if (response.authResponse) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+};
+function dropdownusername(){
+    $("#fbinput").show();
+}
+function notify_permission(){
+    $("#fbinput").append("<div class='alert alert-error'>Please allow the site permission to login.</div>");
+}
+function register() {
+    FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            post(response.authResponse.accessToken);
+        }
+        else if (response.status === 'not_authorized') {
+            if(!fblogin()){
+               notify_permission(); 
+            }
+        }
+        else{
+            if(!fblogin()){
+               notify_permission(); 
+            }
+        }
+    });
+}
+window.fbAsyncInit = function() {
+  // init the FB JS SDK
+  FB.init({
+appId      : '159290990752492', // App ID from the App Dashboard
+channelUrl : '/static/html/channel.html', // Channel File for x-domain communication
+status     : true, // check the login status upon init?
+cookie     : true, // set sessions cookies to allow your server to access the session?
+xfbml      : true  // parse XFBML tags on this page?
+});
+// Additional initialization code such as adding Event Listeners goes here
+
+
+};
+
+// Load the SDK's source Asynchronously
+(function(d){
+ var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+ if (d.getElementById(id)) {return;}
+ js = d.createElement('script'); js.id = id; js.async = true;
+ js.src = "//connect.facebook.net/en_US/all.js";
+ ref.parentNode.insertBefore(js, ref);
+ }(document));
+</script>
+{% endblock scripts %}

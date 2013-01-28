@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
 from django.conf import settings
+from django import forms
+from whauth.backends import AuthBackend
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **other_fields):
@@ -127,3 +129,54 @@ class User(AbstractBaseUser):
                 obj.downvotes+=1
             obj.save()
     # end forum-specifc functions
+
+class UsernameField(forms.CharField):
+    def clean(self,value):
+        super(UsernameField,self).clean(value)
+        try:
+            User.objects.get(username=value)
+            raise forms.ValidationError("Username in use. Please choose another.")
+        except User.DoesNotExist:
+            return value
+
+class NewUserForm(forms.Form):
+    username = UsernameField(max_length=50)
+    password = forms.CharField(widget=forms.PasswordInput,min_length=5)
+    password_confirm = forms.CharField(widget=forms.PasswordInput,min_length=5)
+    email = forms.EmailField()
+    email_confirm = forms.EmailField()
+
+    def clean_email(self):
+        if self.data['email'] != self.data['email_confirm']:
+                raise forms.ValidationError("Emails don't match.")
+        return self.data['email']
+
+    def clean_password(self):
+        if self.data['password'] != self.data['password_confirm']:
+            raise forms.ValidationError("Passwords don't match.")
+        if not re.compile('^[a-zA-Z]\w{5,25}$').match(self.data['password']):
+            raise forms.ValidationError("Invalid password. Be more secure.")
+        return self.data['password']
+                                   
+    def clean(self,*args, **kwargs):
+        self.clean_email()
+        self.clean_password()
+        return super(NewUserForm, self).clean(*args, **kwargs)
+
+class FBTokenField(forms.CharField):
+    def clean(self,value):
+        super(FBTokenField,self).clean(value)
+        auth = AuthBackend()
+        fbid = auth.get_fbid(value)
+        if fbid is None:
+            raise forms.ValidationError("Invalid token: "+value)
+        else:
+            try:
+                User.objects.get(fbid=fbid)
+                raise forms.ValidationError("Fb id already registered")
+            except User.DoesNotExist:
+                return fbid
+    
+class NewFBUserForm(forms.Form):
+    fbtoken = FBTokenField()
+    username = UsernameField()

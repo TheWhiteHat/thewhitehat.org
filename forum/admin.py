@@ -11,7 +11,7 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ('question_text','author')
     inlines = [AnswerInline,]
     fieldsets = (
-       (None, {'fields':(('question_text','body','author','upvotes','category','tags','views'))}),
+       (None, {'fields':(('question_text','body_markdown','author','upvotes','category','tags','views'))}),
     )
 
 admin.site.register(Question, QuestionAdmin)

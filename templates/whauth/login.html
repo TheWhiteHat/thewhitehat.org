@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+{{ at }}
+{% block body %}
+{% if user.is_authenticated %}
+<h1>Already logged in!</h1>
+{% else %}
+<form method="post" action="{% url 'login' %}">{% csrf_token %}
+<input type="text" name="username"/><br>
+<input type="password" name="password"/><br>
+<input type="submit" name="submit" value="login"/>
+</form>
+<a href="#" onclick="login();" class="button">Or login with facebook!</a>
+<div id="fb-root"></div>
+<script>
+  // Additional JS functions here
+  function fblogin(){
+    FB.login(function(response) {
+        if (response.authResponse) {
+          window.location = "{% url 'login' %}?token="+response.authResponse.accessToken;
+        } else {
+          alert("quit cancelling");
+        }
+    });
+
+  };
+function login() {
+FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+          window.location = "{% url 'login' %}?token="+response.authResponse.accessToken;
+    } else if (response.status === 'not_authorized') {
+      fblogin();
+    } else {
+        fblogin();
+    }
+    });
+}
+window.fbAsyncInit = function() {
+  // init the FB JS SDK
+  FB.init({
+appId      : '159290990752492', // App ID from the App Dashboard
+channelUrl : '/static/html/channel.html', // Channel File for x-domain communication
+status     : true, // check the login status upon init?
+cookie     : true, // set sessions cookies to allow your server to access the session?
+xfbml      : true  // parse XFBML tags on this page?
+});
+// Additional initialization code such as adding Event Listeners goes here
+
+
+};
+
+// Load the SDK's source Asynchronously
+(function(d){
+ var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+ if (d.getElementById(id)) {return;}
+ js = d.createElement('script'); js.id = id; js.async = true;
+ js.src = "//connect.facebook.net/en_US/all.js";
+ ref.parentNode.insertBefore(js, ref);
+ }(document));
+</script>
+{% endif %}
+{% endblock %}

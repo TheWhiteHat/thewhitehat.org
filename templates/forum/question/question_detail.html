@@ -1,7 +1,24 @@
 {% extends "base.html" %}
 {% block title %}{{ question.question_text }}{% endblock %}
-{% block head %}
+
+{% block body %}
+<p>{{ question.question_text }}</p>
+<p>downvotes: {{ question.downvotes }}</p>
+<p>upvotes: {{ question.upvotes }}</p>
+<p id="message"></p>
+<p><a onclick="post('up');">upvote</a>
+<p><a onclick="post('down');">downvote</a>
+{% csrf_token %}
+{% endblock body %}
+{% block scripts %}
 <script>
+function show_error(msg){
+    $(".container").append("<div class='alert alert-error'>"+msg+"<a href='#' class='close' data-dismiss='alert'>&times;</a></div>");
+    console.log("errored");
+};
+function show_success(msg){
+    $(".container").append("<div class='alert alert-success'>"+msg+"</div>");
+};
 function post(msg){
     console.log("posting...");
     $.ajax({
@@ -16,22 +33,26 @@ function post(msg){
     }).done(function( msg ) {
         var response = jQuery.parseJSON(msg);
         if (response.success == false){
-            $("#message").html("error: "+response.reason);
+            switch(response.reason){
+                case 'user_cannot_vote':
+                    show_error("You may not vote on this. You may be under a ban.");
+                    break;
+                case 'user_already_voted':
+                    show_error("You have already voted on this.");
+                    break;
+                case 'object_does_not_exist':
+                    show_error("Invalid object.");
+                    break;
+            }
         }else{
-            $("#message").html("success: "+response.message);
+            switch(response.message){
+                case 'vote_handled':
+                    show_success("Voted!");
+                    break;
+            }
         }
     });
 
 }
 </script>
-{% endblock head %}
-
-{% block body %}
-<p>{{ question.question_text }}</p>
-<p>downvotes: {{ question.downvotes }}</p>
-<p>upvotes: {{ question.upvotes }}</p>
-<p id="message"></p>
-<p><a onclick="post('up');">upvote</a>
-<p><a onclick="post('down');">downvote</a>
-{% csrf_token %}
-{% endblock body %}
+{% endblock scripts %}

@@ -41,7 +41,7 @@ class UserAdmin(DjangoUserAdmin):
     list_filter = ('role',)
     
     fieldsets = (
-        ('Profile', {'fields': ('username', 'email', 'role', 'use_gravatar')}),
+        ('Profile', {'fields': ('username', 'email', 'role', 'use_gravatar','fbid')}),
     )
 
     add_fieldsets = (

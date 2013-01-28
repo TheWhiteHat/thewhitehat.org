@@ -6,6 +6,7 @@ from django.contrib.contenttypes import generic
 from django.template.defaultfilters import slugify
 from whauth.models import User
 import datetime
+from markdown import markdown
 
 class Vote(models.Model):
     DIRECTIONS = (('up','Up'),('down','Down'))
@@ -33,7 +34,8 @@ class Votable(models.Model):
 class Question(Votable):
     question_text = models.CharField(max_length=126)
     slug = models.SlugField(unique=True)
-    body = models.TextField()
+    body_html = models.TextField()
+    body_markdown = models.TextField()
     author = models.ForeignKey(User)
     date_posted = models.DateTimeField(auto_now_add=True)
     lasted_edited = models.DateTimeField(auto_now=True)
@@ -51,7 +53,10 @@ class Question(Votable):
         if not self.id:
             now = datetime.datetime.now()
             self.slug = slugify(self.question_text)[0:37]+now.strftime("%m%d%Y%M%S")
+
+        self.body_html = markdown(self.body_markdown)
         super(Question, self).save(*args, **kwargs)
+
 
 
 class Answer(Votable):
