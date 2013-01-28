@@ -3,6 +3,7 @@ from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
 from django.conf import settings
 from django import forms
 from whauth.backends import AuthBackend
+import re
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **other_fields):
