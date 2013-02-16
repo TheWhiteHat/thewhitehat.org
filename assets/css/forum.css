@@ -1,4 +1,4 @@
-.tag-bar{   
+.tag-bar{
     background-color:#BBD8E9;
 }
 .cat-block{
@@ -50,3 +50,14 @@ color: #468AB8;
     margin: 0px 4px 0px 0px;
     height: 20px;
 }
+.question-summary{
+    border-bottom:2px solid #999;
+}
+.question-summary-int{
+    font-size: 25px;
+    text-align:center;
+}
+.question-summary-int span{
+    font-size: 10px;
+}
+

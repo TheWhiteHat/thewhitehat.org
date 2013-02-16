@@ -50,11 +50,11 @@ def register(request):
         if request.is_ajax(): #a new fbuser.
             form = NewFBUserForm(request.POST)
             if form.is_valid():
-                #try:
-                User.objects.create_user(username=form.cleaned_data['username'],fbid=form.cleaned_data['fbtoken'])
-                return json_success("user_registered")
-                #except:
-                #    return json_error("error")
+                try:
+                    User.objects.create_user(username=form.cleaned_data['username'],fbid=form.cleaned_data['fbtoken'])
+                    return json_success("user_registered")
+                except:
+                    return json_error("register_error")
             else:
                 return json_error(form.errors)
         else:# a regular username & password login.

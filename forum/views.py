@@ -16,7 +16,7 @@ def forum_index(request):
 # paginates questions, with optional filters.
 def question_index(request,page_number, **kwargs):
     # note: django does lazy query fetching so it does not *actually* fetch all just yet.
-    questions = Question.objects.order_by('-date_posted').all()
+    questions = Question.objects.select_related().order_by('-date_posted').all()
 
     # page these questions
     paginator = Paginator(questions,10)

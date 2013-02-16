@@ -41,7 +41,8 @@ class Question(Votable):
     lasted_edited = models.DateTimeField(auto_now=True)
     category = models.ForeignKey(Category)
     tags = models.ManyToManyField(Tag)
-    views = models.IntegerField()
+    views = models.IntegerField(default=0)
+    answers_count = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.slug
@@ -65,6 +66,18 @@ class Answer(Votable):
     author = models.ForeignKey(User)
     date_posted = models.DateTimeField(auto_now_add=True)
     lasted_edited = models.DateTimeField(auto_now=True)
+
+    def save(self,*args,**kwargs):
+        self.question.answers_count += 1
+        self.question.save()
+
+        super(Answer, self).save(*args,**kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.question.answers_count -= 1
+        self.question.save()
+
+        super(Answer, self).delete(*args,**kwargs)
 
 class AnswerComment(models.Model):
     answer = models.ForeignKey(Answer)
