@@ -60,3 +60,11 @@ color: #468AB8;
 .question-summary-int span{
     font-size: 10px;
 }
+.question-detail-answer{
+    background-color: #F7F7F7;
+    box-shadow: 0px 0px 0px 3px #F7F7F7;
+    border-radius: 3px;
+}
+.question-answer-list{
+    margin-bottom: 15px;
+}

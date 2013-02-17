@@ -1,58 +1,90 @@
 {% extends "base.html" %}
 {% block title %}{{ question.question_text }}{% endblock %}
-
+{% block head %}
+<link type="text/css" rel="stylesheet" href="/static/css/forum.css"></link>
+{% endblock head %}
 {% block body %}
-<p>{{ question.question_text }}</p>
-<p>downvotes: {{ question.downvotes }}</p>
-<p>upvotes: {{ question.upvotes }}</p>
 <p id="message"></p>
-<p><a onclick="post('up');">upvote</a>
-<p><a onclick="post('down');">downvote</a>
-{% csrf_token %}
+<div class="span10">
+    <div class="row">
+        <div class="span1">
+        {% if user.is_authenticated %}
+        {% load merge %}
+            {% with test_down="question"|merge_string:question.id|merge_string:"down"|slugify test_up="question"|merge_string:question.id|merge_string:"up"|slugify %}
+            <a class="btn btn-mini {% if test_up in votes %}btn-info{% endif %}" onclick="vote('up','question','{{ question.id }}');"><i class="icon-arrow-up"></i></a> {{ question.upvotes }}<br/>
+            <a class="btn btn-mini {% if test_down in votes %}btn-info{% endif %}" onclick="vote('down','question','{{ question.id }}');"><i class="icon-arrow-down"></i></a> {{ question.downvotes }}
+            {% endwith %}
+        {% else %}
+            <a class="btn btn-mini" onclick="login_info();"><i class="icon-arrow-up"></i></a> {{ question.upvotes }}<br/>
+            <a class="btn btn-mini" onclick="login_info();"><i class="icon-arrow-down"></i></a> {{ question.downvotes }}<br/>
+        {% endif %}
+        </div>
+        <div class="span9">
+            <h2>{{ question.question_text }}</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span9 offset1">
+            {{ question.body_html|safe }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="span5 offset1 question-detail-author">
+            <p>asked on {{ question.date_posted }}</p>
+            <p>by {{ question.author.username }}</p>
+        </div>
+    </div>
+    <div class="row"><div class="span9 offset1"><h2>Answers</h2></div></div>
+    {% for answer in answers %}
+        <div id="{{ answer.id }}" class="row question-answer-list">
+        <div class="span1">
+        {% if user.is_authenticated %}
+            {% with test_down="answer"|merge_string:answer.id|merge_string:"down"|slugify test_up="answer"|merge_string:answer.id|merge_string:"up"|slugify %}
+            <a class="btn btn-mini {% if test_up in votes %}btn-info{% endif %}" onclick="vote('up','answer','{{ answer.id }}');"><i class="icon-arrow-up"></i></a> {{ answer.upvotes }}<br/>
+            <a class="btn btn-mini {% if test_down in votes %}btn-info{% endif %}" onclick="vote('down','answer','{{ answer.id }}');"><i class="icon-arrow-down"></i></a> {{ answer.downvotes }}
+            {% endwith %}
+        {% else %}
+            <a class="btn btn-mini" onclick="login_info();"><i class="icon-arrow-up"></i></a> {{ answer.upvotes }}<br/>
+            <a class="btn btn-mini" onclick="login_info();"><i class="icon-arrow-down"></i></a> {{ answer.downvotes }}<br/>
+        {% endif %}
+        </div>
+            <div class="span7 question-detail-answer ">{{ answer.body_html|safe }}</div>
+            <div class="span2 question-detail-answer ">
+                <p>By <a href="{{ answer.author.get_absolute_url }}">{{ answer.author.username }}</a></p>
+                <p>On {{ answer.date_posted }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="row"><div class="span9 offset1"><h2>Add your answer</h2></div></div>
+    <div class="row">
+    {% if user.is_authenticated %}
+        <div class="span9 offset1 well">
+            <form action="{% url 'handle_answer' %}" method="post">{% csrf_token %}
+                <input type="hidden" name="qid" value="{{ question.id }}"/>
+                <textarea class="span9" name="answer_body" rows="20"></textarea><br />
+                <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    {% else %}
+        <p>Please login to post an answer.</p>
+    {% endif %}
+    </div>
+</div>
 {% endblock body %}
 {% block scripts %}
+<script type="text/javascript">
+var csrf_token = "{{ csrf_token }}";
+var question_id = "{{ question.id }}";
+var vote_handler = "{% url 'handle_vote' %}";
+</script>
+<link href="/static/css/prettyprint/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/static/js/prettyprint/prettify.js"></script>
+<script type="text/javascript" src="/static/js/question_detail.js"></script>
 <script>
-function show_error(msg){
-    $(".container").append("<div class='alert alert-error'>"+msg+"<a href='#' class='close' data-dismiss='alert'>&times;</a></div>");
-    console.log("errored");
-};
-function show_success(msg){
-    $(".container").append("<div class='alert alert-success'>"+msg+"</div>");
-};
-function post(msg){
-    console.log("posting...");
-    $.ajax({
-      type: "POST",
-      url: "/forum/question/vote/",
-      data: {
-        csrfmiddlewaretoken: '{{ csrf_token }}',
-        objid: "{{ question.id }}", 
-        objtype: "question", 
-        dir:msg,
-      }
-    }).done(function( msg ) {
-        var response = jQuery.parseJSON(msg);
-        if (response.success == false){
-            switch(response.reason){
-                case 'user_cannot_vote':
-                    show_error("You may not vote on this. You may be under a ban.");
-                    break;
-                case 'user_already_voted':
-                    show_error("You have already voted on this.");
-                    break;
-                case 'object_does_not_exist':
-                    show_error("Invalid object.");
-                    break;
-            }
-        }else{
-            switch(response.message){
-                case 'vote_handled':
-                    show_success("Voted!");
-                    break;
-            }
-        }
-    });
-
-}
+!function ($) {
+  $(function(){
+  window.prettyPrint && prettyPrint()   
+  })
+}(window.jQuery);
 </script>
 {% endblock scripts %}

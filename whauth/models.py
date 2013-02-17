@@ -100,12 +100,12 @@ class User(AbstractBaseUser):
 
     class AlreadyVoted(Exception):
         pass
-    
-    # vote on an a given object.    
+
+    # vote on an a given object.
     def vote_on_object(self,obj,direction):
         from forum.models import Vote
         try:
-            vote = obj.votes.get(user=self) 
+            vote = obj.votes.get(user=self)
             if vote.direction == direction:
                 raise self.AlreadyVoted()
             else:

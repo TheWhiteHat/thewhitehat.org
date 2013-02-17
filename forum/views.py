@@ -2,9 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from forum.models import Question, Answer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.utils import simplejson as json
 from whauth.models import User
+from forum.models import *
+from django.db.models import Q
 
 # the index for the forum page.
 # links to questions, discussions, and polls.
@@ -33,8 +35,23 @@ def question_index(request,page_number, **kwargs):
 # displays a question and its respective answers given a question id.
 def question_detail(request,slug):
     question = get_object_or_404(Question,slug=slug)
-    answers = Answer.objects.select_related().get(question=question)
-    return render(request, 'forum/question/question_detail.html',{'question':question,'answers':answers})
+    answers = Answer.objects.select_related().filter(question=question)
+    request.session['current_question'] = question.id
+    if request.user.is_authenticated():
+        # filter things that user has voted on.
+        vote_filter = Q(object_id=question.id)
+        for answer in answers:
+            vote_filter = vote_filter | Q(object_id=answer.id)
+        vote_filter = (vote_filter) & Q(user=request.user)
+        user_votes = Vote.objects.filter(vote_filter).all()
+
+        # send the template something that it can index into without
+        object_vote_ids = [v.content_type.model+str(v.id)+v.direction for v in user_votes]
+    else:
+        object_vote_ids = None
+
+    form = SubmitAnswerForm()
+    return render(request, 'forum/question/question_detail.html',{'question':question,'answers':answers,'form':form,'votes':object_vote_ids})
 
 # does a string represent an integer?
 def is_int(s):
@@ -73,40 +90,60 @@ def handle_vote(request):
         if not validate_vote_request(object_id,direction):
             return json_error("invalid_vote")
 
+        obj = None
+
         # handle a vote on a question
         if object_type == 'question':
             try:
-                question = Question.objects.get(id=int(object_id))
-                try:
-                    request.user.vote_on_object(question,direction)
-                    return json_success("vote_handled")
-                except User.CannotVote:
-                    return json_error("user_cannot_vote")
-                except User.AlreadyVoted: 
-                    return json_error("user_already_voted")
-
-                return json_succcess("vote_handled")
-
+                obj = Question.objects.get(id=int(object_id))
             except Question.DoesNotExist:
                     return json_error("object_does_not_exist")
-            
-            
+
         # handle a vote on an answer
         if object_type == 'answer':
             try:
-                answer = answer.objects.get(id=int(object_id))
-                try:
-                    request.user.vote_on_object(answer,direction)
-                    return json_success("vote_handled")
-                except User.CannotVote:
-                    return json_error("user_cannot_vote")
-                except User.AlreadyVoted: 
-                    return json_error("user_already_voted")
-
-                return json_succcess("vote_handled")
-
-            except Question.DoesNotExist:
+                obj = Answer.objects.get(id=int(object_id))
+            except Answer.DoesNotExist:
                     return json_error("object_does_not_exist")
+
+        # vote on the object
+        try:
+            request.user.vote_on_object(obj,direction)
+            return json_success("vote_handled")
+        except User.CannotVote:
+                return json_error("user_cannot_vote")
+        except User.AlreadyVoted: 
+                return json_error("user_already_voted")
+
     else:
         return HttpResponse("not a post")
 
+
+# handle an answer to a question
+@login_required
+def handle_answer(request):
+    if request.method == 'POST':
+        form = SubmitAnswerForm(request.POST)
+        if form.is_valid():
+            try:
+                qid = form.cleaned_data['qid']
+                answer_body = form.cleaned_data['answer_body']
+                # make sure that users aren't 'answering' questions that
+                # that they aren't looking at.
+                try:
+                    if request.session['current_question'] != qid:
+                        return render("error.html",{'error':'Nonmatching question and session id'})
+                except KeyError:
+                        return render("error.html",{'error':'Session trouble'})
+
+                question = Question.objects.get(id=qid)
+                answer = Answer()
+                answer.question = question
+                answer.body_markdown = answer_body
+                answer.author = request.user
+                answer.save()
+                return HttpResponseRedirect(reverse('question_detail',kwargs={'slug':question.slug}))
+            except Question.DoesNotExist:
+               return render("error.html",{'error':'Question does not exist'})
+        else:
+            return render("error.html",{'error':'Invalid form post'})
