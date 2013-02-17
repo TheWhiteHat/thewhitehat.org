@@ -95,3 +95,7 @@ class AnswerComment(models.Model):
 class SubmitAnswerForm(forms.Form):
     answer_body = forms.CharField(widget=forms.Textarea)
     qid = forms.IntegerField()
+
+class NewQuestionForm(forms.Form):
+    body_text = forms.CharField(widget=forms.Textarea)
+    tags = forms.CharField()

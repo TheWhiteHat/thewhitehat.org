@@ -7,6 +7,7 @@ from django.utils import simplejson as json
 from whauth.models import User
 from forum.models import *
 from django.db.models import Q
+from django.template.defaultfilters import slugify
 
 # the index for the forum page.
 # links to questions, discussions, and polls.
@@ -132,9 +133,9 @@ def handle_answer(request):
                 # that they aren't looking at.
                 try:
                     if request.session['current_question'] != qid:
-                        return render("error.html",{'error':'Nonmatching question and session id'})
+                        return render(request,"error.html",{'error':'Nonmatching question and session id'})
                 except KeyError:
-                        return render("error.html",{'error':'Session trouble'})
+                        return render(request,"error.html",{'error':'Session trouble'})
 
                 question = Question.objects.get(id=qid)
                 answer = Answer()
@@ -144,6 +145,29 @@ def handle_answer(request):
                 answer.save()
                 return HttpResponseRedirect(reverse('question_detail',kwargs={'slug':question.slug}))
             except Question.DoesNotExist:
-               return render("error.html",{'error':'Question does not exist'})
+               return render(request,"error.html",{'error':'Question does not exist'})
         else:
-            return render("error.html",{'error':'Invalid form post'})
+            return render(request,"error.html",{'error':'Invalid form post'})
+
+@login_required
+def new_question(request):
+    if request.method == 'POST':
+        form = NewQuestionForm(request.POST)
+        if form.is_valid():
+            question = Question()
+            question.body_markdown = form.cleaned_data['body_text']
+            question.author = request.user
+
+            tags = form.cleaned_data['tags'].split(",")
+            tag_objects = []
+            for tag in tags:
+                tag_name = slugify(tag)
+                tag_object = Tag.objects.get_or_create(name=tag_name)
+                question.tags.add(tag_object)
+
+            question.save()
+    else:
+        form = NewQuestionForm()
+
+    tags = Tag.objects.all()
+    return render(request,"forum/question/new_question.html",{'form':form,'tags':tags})

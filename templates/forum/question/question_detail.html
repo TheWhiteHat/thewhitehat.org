@@ -54,20 +54,24 @@
                 <p>On {{ answer.date_posted }}</p>
             </div>
         </div>
+    {% empty %}
+    <div class="row">
+        <div class="span9 offset1">No answers :(</div>
+    </div>
     {% endfor %}
     <div class="row"><div class="span9 offset1"><h2>Add your answer</h2></div></div>
     <div class="row">
-    {% if user.is_authenticated %}
         <div class="span9 offset1 well">
+    {% if user.is_authenticated %}
             <form action="{% url 'handle_answer' %}" method="post">{% csrf_token %}
                 <input type="hidden" name="qid" value="{{ question.id }}"/>
                 <textarea class="span9" name="answer_body" rows="20"></textarea><br />
                 <input type="submit" value="Submit"/>
             </form>
-        </div>
     {% else %}
         <p>Please login to post an answer.</p>
     {% endif %}
+        </div>
     </div>
 </div>
 {% endblock body %}

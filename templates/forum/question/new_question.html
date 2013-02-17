@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Ask a New Question{% endblock %}
+{% block head %}
+<link type="text/css" rel="stylesheet" href="/static/css/forum.css"></link>
+<lihnk type="text/css" rel="stylesheet" href="/static/css/bootstrap-tagmanager.css"></link>
+{% endblock head %}
+{% block body %}
+<div class="span12">
+<h1>Post a new question</h1>
+<form action="{% url 'new_question' %}" method="POST">
+<textarea name="body_text" class="span12"></textarea>
+<input type="text" name="tags" placeholder="Tags" class="tagManager"/>
+<input type="hidden" value="" name="hiddenTagList">
+<input type="submit" value="submit"/>
+</form>
+</div>
+{% endblock body %}
+{% block scripts %}
+<script type="text/javascript" src="/static/js/bootstrap-tagmanager.js"></script>
+<script type="text/javascript">
+jQuery(".tagManager").tagsManager({
+    CapitalizeFirstLetter: true,
+    preventSubmitOnEnter: true,
+    typeahead: true,
+    typeaheadAjaxSource: null,
+    typeaheadSource: [{% for tag in tags %}"{{ tag }}", {% endfor %}],
+    delimeters: [44, 188, 13],
+    backspace: [8]
+    blinkBGColor_1: '#FFFF9C',
+    blinkBGColor_2: '#CDE69C',
+    hiddenTagListName: 'hiddenTagListA'
+  });
+</script>
+{% endblock %}
