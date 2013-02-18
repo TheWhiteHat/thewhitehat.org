@@ -40,7 +40,7 @@ class Question(Votable):
     author = models.ForeignKey(User)
     date_posted = models.DateTimeField(auto_now_add=True)
     lasted_edited = models.DateTimeField(auto_now=True)
-    category = models.ForeignKey(Category)
+    #category = models.ForeignKey(Category)
     tags = models.ManyToManyField(Tag)
     views = models.IntegerField(default=0)
     answers_count = models.IntegerField(default=0)
@@ -97,5 +97,6 @@ class SubmitAnswerForm(forms.Form):
     qid = forms.IntegerField()
 
 class NewQuestionForm(forms.Form):
+    question_text = forms.CharField()
     body_text = forms.CharField(widget=forms.Textarea)
-    tags = forms.CharField()
+    tagslist = forms.CharField()

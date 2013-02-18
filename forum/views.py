@@ -47,7 +47,7 @@ def question_detail(request,slug):
         user_votes = Vote.objects.filter(vote_filter).all()
 
         # send the template something that it can index into without
-        object_vote_ids = [v.content_type.model+str(v.id)+v.direction for v in user_votes]
+        object_vote_ids = [v.content_type.model+str(v.object_id)+v.direction for v in user_votes]
     else:
         object_vote_ids = None
 
@@ -156,13 +156,15 @@ def new_question(request):
         if form.is_valid():
             question = Question()
             question.body_markdown = form.cleaned_data['body_text']
+            question.question_text = form.cleaned_data['question_text']
             question.author = request.user
+            question.save()
 
-            tags = form.cleaned_data['tags'].split(",")
+            tags = form.cleaned_data['tagslist'].split(",")
             tag_objects = []
             for tag in tags:
                 tag_name = slugify(tag)
-                tag_object = Tag.objects.get_or_create(name=tag_name)
+                tag_object,created = Tag.objects.get_or_create(name=tag_name)
                 question.tags.add(tag_object)
 
             question.save()
