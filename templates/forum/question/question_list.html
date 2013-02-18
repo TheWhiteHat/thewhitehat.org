@@ -7,6 +7,10 @@
 {% block body %}
 <div class="row">
 <div class="span10">
+<ul class="breadcrumb">
+  <li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
+  <li class="active">Questions</li>
+</ul>
     {% for question in questions %}
         <div class="row">
             <div class="span3">
@@ -16,7 +20,7 @@
                     <span class="question-summary-int span1">{{ question.views }}<br /><span>Views</span></span>
                 </div>
             </div>
-            <div class="span">
+            <div class="span7 question-summary">
                 <a class="question-summary-question-text" href="{{ question.get_absolute_url }}">{{ question.question_text }}</a>
                 <span class="question-summary-question-time">{{ question.date_posted }}</span>
                 <div class="question-summary-tags-container">

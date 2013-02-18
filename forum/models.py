@@ -69,12 +69,22 @@ class Answer(Votable):
     date_posted = models.DateTimeField(auto_now_add=True)
     lasted_edited = models.DateTimeField(auto_now=True)
 
-    def save(self,*args,**kwargs):
-        self.question.answers_count += 1
-        self.question.save()
-        self.body_html = render_markdown(self.body_markdown)
 
-        super(Answer, self).save(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        # create a reference for detecting if markdown was changed.
+        # that way we don't have to re-render upon save after vote.
+        super(Answer, self).__init__(*args, **kwargs)
+        self._old_body_md = self.body_markdown
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.question.answers_count += 1
+            self.question.save()
+
+        if self._old_body_md != self.body_markdown:
+            self.body_html = render_markdown(self.body_markdown)
+
+        super(Answer, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         self.question.answers_count -= 1
