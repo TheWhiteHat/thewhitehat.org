@@ -13,3 +13,6 @@ static
 # Editor temp files
 *~
 *.swp
+
+# scripts
+*.sh
