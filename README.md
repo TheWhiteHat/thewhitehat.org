@@ -9,5 +9,5 @@ Get Started
 5. Install the requirements (`pip install -r requirements.txt`)
 6. Create the dev database (`python manage.py syncdb`)
    * create an admin account for yourself when it asks
-7. Load some test data (`python manage.py loaddata test`)
+7. Load some test data (`python manage.py loaddata dump.json`)
 8. Run the development server (`python manage.py runserver`)
