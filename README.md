@@ -1,7 +1,7 @@
 Get Started
 ===========
 1. Clone the project
-2. `git checkout new`
+2. `git checkout moreforums`
 3. Create a virtual environment (`virtualenv venv`)
    * on debian you can `apt-get install python-virtualenv`
    * or get it on github [here](http://github.com/pypa/virtualenv)

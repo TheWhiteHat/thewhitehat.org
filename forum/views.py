@@ -9,6 +9,7 @@ from forum.models import *
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
+
 # the index for the forum page.
 # links to questions, discussions, and polls.
 # shows the latest q's, d's, and p's and lists popular tags.
