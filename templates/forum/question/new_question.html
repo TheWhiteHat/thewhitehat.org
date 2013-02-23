@@ -2,17 +2,46 @@
 {% block title %}Ask a New Question{% endblock %}
 {% block head %}
 <link type="text/css" rel="stylesheet" href="/static/css/forum.css"></link>
-<lihnk type="text/css" rel="stylesheet" href="/static/css/bootstrap-tagmanager.css"></link>
+<link type="text/css" rel="stylesheet" href="/static/css/bootstrap-tagmanager.css"></link>
 {% endblock head %}
 {% block body %}
 <div class="span12">
-<h1>Post a new question</h1>
-<form action="{% url 'new_question' %}" method="POST">
-<textarea name="body_text" class="span12"></textarea>
-<input type="text" name="tags" placeholder="Tags" class="tagManager"/>
-<input type="hidden" value="" name="hiddenTagList">
-<input type="submit" value="submit"/>
-</form>
+    <div class="row">
+        <h1>Post a new question</h1>
+        <form action="{% url 'new_question' %}" method="POST" class="form-horizontal well">
+            <h1>{{ form.non_field_error }}</h1>
+            <h1>{{ form.errors }}</h1>
+            {% for error in form.errors %}
+            <h1>{{ error }}</h1>
+            {% endfor %}
+            {% csrf_token %}
+            <div class="control-group">
+                <label class="control-label" for="question_text">Question</label>
+                <div class="controls">
+                    <input type="text" class="input-xxlarge" name="question_text" placeholder="Be clear and concise..." />
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="body_text" class="control-label">Details</label>
+                <div class="controls">
+                    <textarea  class="input-xxlarge" name="body_text" rows="15" ></textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="tags" class="control-label">Tags</label>
+                <div class="controls">
+                    <input type="text" name="tags" placeholder="Type & hit Enter" class="tagManager"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <input type="submit" value="submit" class="btn"/>
+                </div>
+            </div>
+                <br/>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock body %}
 {% block scripts %}
@@ -25,10 +54,10 @@ jQuery(".tagManager").tagsManager({
     typeaheadAjaxSource: null,
     typeaheadSource: [{% for tag in tags %}"{{ tag }}", {% endfor %}],
     delimeters: [44, 188, 13],
-    backspace: [8]
+    backspace: [8],
     blinkBGColor_1: '#FFFF9C',
     blinkBGColor_2: '#CDE69C',
-    hiddenTagListName: 'hiddenTagListA'
+    hiddenTagListName: 'tagslist'
   });
 </script>
 {% endblock %}
