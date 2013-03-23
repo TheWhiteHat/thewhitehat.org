@@ -112,10 +112,12 @@ class User(AbstractBaseUser):
                 vote.direction = direction
                 vote.save()
                 if direction == 'up':
-                    obj.downvotes-=1
+                    if obj.downvotes != 0:
+                        obj.downvotes-=1
                     obj.upvotes+=1
                 else:
-                    obj.upvotes-=1
+                    if obj.upvotes != 0:
+                        obj.upvotes-=1
                     obj.downvotes+=1
                 obj.save()
         except AttributeError:

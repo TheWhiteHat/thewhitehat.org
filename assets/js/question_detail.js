@@ -1,4 +1,5 @@
 jQuery.fn.vote = function(dir,objtype,objid){
+    // if the user clicked the button that wasn't hightlighted
     if (!$(this).hasClass("btn-info")){
     (function(obj,dir){
         $.ajax({
@@ -29,22 +30,33 @@ jQuery.fn.vote = function(dir,objtype,objid){
                 }
             }else{
                 $(obj).addClass("btn-info");
+
                 if(dir=="up"){
-                    console.log("traversing next");
-                    $(obj).next().next(".vote").removeClass("btn-info");
-                    var num = parseInt($(obj).nextAll("span").first().text());
-                    console.log("num is "+num);
-                    $(obj).nextAll("span").first().text(num+1);
-                    var num2 = parseInt($(obj).nextAll(".vote").nextAll("span").first().text());
-                    $(obj).nextAll(".vote").nextAll("span").first().html(num2-1);
-                }else{
-                    console.log("traversing prev");
-                    $(obj).prevAll(".vote").removeClass("btn-info")
-                    var num = parseInt($(obj).nextAll("span").first().text());
-                    $(obj).nextAll("span").first().text(num+1);
-                    var num2 = parseInt($(obj).prevAll(".vote").nextAll("span").first().text());
-                    $(obj).prevAll(".vote").nextAll("span").first().html(num2-1);
+                    var thisSpn = $(obj).nextAll("span").first();
+                    var otherBtn = $(obj).next().next(".vote");
+                    var otherSpn = $(obj).nextAll(".vote").nextAll("span").first();
                 }
+                else if(dir=="down"){
+                    var thisSpn = $(obj).nextAll("span").first();
+                    var otherBtn = $(obj).prevAll(".vote").first();
+                    var otherSpn = $(obj).prevAll(".vote").nextAll("span").first();
+                }
+
+                var otherBtnActive = otherBtn.hasClass("btn-info");
+
+                // remove the highlighting from the other button
+                // and decrement votes if it had any
+                if(otherBtnActive){
+                    otherBtn.removeClass("btn-info");
+                    var otherVotes = parseInt(otherSpn.text());
+                    otherVotes != 0 && otherSpn.html(otherVotes-1);
+                }
+
+                // get the current votes from the current button
+                // and increment
+                var thisVotes = parseInt(thisSpn.text());
+                thisSpn.text(thisVotes+1);
+
             }
         }
         );

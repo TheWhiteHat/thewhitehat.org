@@ -5,12 +5,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import simplejson as json
 from whauth.models import User
 from forum.models import Vote, Question, Answer, SubmitAnswerForm, \
-    NewQuestionForm
+    NewQuestionForm, Thread, Post
 from blog.models import Tag
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
-
 
 
 # the index for the forum page.
@@ -22,10 +21,11 @@ def forum_index(request):
 
 
 # paginates questions, with optional filters.
-def question_index(request, page_number, **kwargs):
+def question_list(request, page_number, **kwargs):
     # note: django does lazy query fetching so it does not
     # *actually* fetch all just yet.
-    questions = Question.objects.select_related().order_by('-date_posted').all()
+    questions = Question.objects.select_related(
+    ).order_by('-date_posted').all()
 
     # page these questions
     paginator = Paginator(questions, 10)
@@ -47,19 +47,25 @@ def question_index(request, page_number, **kwargs):
 def question_detail(request, slug):
     question = get_object_or_404(Question, slug=slug)
     # get all answers for the question and order them by respective vote score.
-    answers = Answer.objects.extra(select={'votesum':'forum_votable.upvotes - forum_votable.downvotes'},order_by=('-votesum',)).select_related().filter(question=question)
+    answers = Answer.objects.extra(
+        select={'votesum':
+                'forum_votable.upvotes - forum_votable.downvotes'},
+        order_by=('-votesum',)
+    ).select_related().filter(question=question)
+
     request.session['current_question'] = question.id
+
     if request.user.is_authenticated():
         # filter things that user has voted on, use Q to build the query.
         vote_filter = Q(object_id=question.id)
+        vote_filter = (vote_filter) & Q(user=request.user)
         for answer in answers:
             vote_filter = vote_filter | Q(object_id=answer.id)
-        vote_filter = (vote_filter) & Q(user=request.user)
         user_votes = Vote.objects.filter(vote_filter).all()
 
         # send the template something that it can index into without
         # making voting objects
-        object_vote_ids = [v.content_type.model+str(v.object_id)+v.direction
+        object_vote_ids = [v.content_type.model + str(v.object_id) + v.direction
                            for v in user_votes]
     else:
         object_vote_ids = None
@@ -119,31 +125,31 @@ def handle_vote(request):
             try:
                 obj = Question.objects.get(id=int(object_id))
             except Question.DoesNotExist:
-                    return json_error("object_does_not_exist")
+                return json_error("object_does_not_exist")
 
         # handle a vote on an answer
         if object_type == 'answer':
             try:
                 obj = Answer.objects.get(id=int(object_id))
             except Answer.DoesNotExist:
-                    return json_error("object_does_not_exist")
+                return json_error("object_does_not_exist")
 
         # vote on the object
         try:
             request.user.vote_on_object(obj, direction)
             return json_success("vote_handled")
         except User.CannotVote:
-                return json_error("user_cannot_vote")
+            return json_error("user_cannot_vote")
         except User.AlreadyVoted:
-                return json_error("user_already_voted")
+            return json_error("user_already_voted")
 
     else:
         return HttpResponse("not a post")
 
 
-# handle an answer to a question
 @login_required
 def handle_answer(request):
+    """handle an answer to a question"""
     if request.method == 'POST':
         form = SubmitAnswerForm(request.POST)
         if form.is_valid():
@@ -154,9 +160,14 @@ def handle_answer(request):
                 # that they aren't looking at.
                 try:
                     if request.session['current_question'] != qid:
-                        return render(request,"error.html",{'error':'Nonmatching question and session id'})
+                        return render(request, "error.html",
+                                      {'error':
+                                       'Nonmatching question and session id'}
+                                      )
                 except KeyError:
-                        return render(request,"error.html",{'error':'Session trouble'})
+                    return render(request, "error.html",
+                                  {'error': 'Session trouble'}
+                                  )
 
                 question = Question.objects.get(id=qid)
                 answer = Answer()
@@ -164,11 +175,15 @@ def handle_answer(request):
                 answer.body_markdown = answer_body
                 answer.author = request.user
                 answer.save()
-                return HttpResponseRedirect(reverse('question_detail',kwargs={'slug':question.slug}))
+                return HttpResponseRedirect(reverse('question_detail',
+                                                    kwargs={'slug': question.slug})
+                                            )
             except Question.DoesNotExist:
-               return render(request,"error.html",{'error': 'Question does not exist'})
+                return render(request, "error.html",
+                              {'error': 'Question does not exist'}
+                              )
         else:
-            return render(request, "error.html",{'error': 'Invalid form post'})
+            return render(request, "error.html", {'error': 'Invalid form post'})
 
 
 @login_required
@@ -185,13 +200,74 @@ def new_question(request):
             tags = form.cleaned_data['tagslist'].split(",")
             for tag in tags:
                 tag_name = slugify(tag)
-                tag_object,created = Tag.objects.get_or_create(name=tag_name)
+                tag_object, created = Tag.objects.get_or_create(name=tag_name)
                 question.tags.add(tag_object)
 
             question.save()
-            return HttpResponseRedirect(reverse('question_detail',kwargs={'slug':question.slug}))
+            return HttpResponseRedirect(reverse('question_detail', kwargs={'slug': question.slug}))
     else:
         form = NewQuestionForm()
 
     tags = Tag.objects.all()
-    return render(request,"forum/question/new_question.html",{'form':form,'tags':tags})
+    return render(request, "forum/question/new_question.html", {'form': form, 'tags': tags})
+
+#@login_required
+# def handle_edit(request):
+#    """ handle an AJAX edit"""
+#    if request.method is not "POST":
+#
+
+def discussion_list(request, page_number, **kwargs):
+    threads = Thread.objects.select_related(
+    ).order_by('-date_posted').all()
+
+    if 'board_slug' in kwargs:
+        threads = threads.filter(board__slug=kwargs['board_slug'])
+
+    # page these threads
+    paginator = Paginator(threads, 10)
+    if page_number == '':
+        page_number = 1
+    try:
+        thread_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        thread_list = paginator.page(1)
+    except EmptyPage:
+        thread_list = paginator.page(paginator.num_pages)
+    return render(request,
+                  'forum/discussion/discussion_list.html',
+                  {'threads': thread_list}
+                  )
+
+def discussion_detail(request, thread_slug):
+    thread = get_object_or_404(Thread, slug=thread_slug)
+    # TODO: page replies.
+    replies = Post.objects.filter(thread=thread)
+    return render(request, "forum/discussion/thread_detail.html",
+                  {"thread": thread, "replies": replies}
+                  )
+
+@login_required
+def new_discussion(request):
+    if request.method == 'POST':
+        form = NewDiscussionForm(request.POST)
+        if form.is_valid():
+            question = Question()
+            question.body_markdown = form.cleaned_data['body_text']
+            question.question_text = form.cleaned_data['question_text']
+            question.author = request.user
+            question.save()
+
+            tags = form.cleaned_data['tagslist'].split(",")
+            for tag in tags:
+                tag_name = slugify(tag)
+                tag_object, created = Tag.objects.get_or_create(name=tag_name)
+                question.tags.add(tag_object)
+
+            question.save()
+            return HttpResponseRedirect(reverse('question_detail', kwargs={'slug': question.slug}))
+    else:
+        form = NewQuestionForm()
+
+    tags = Tag.objects.all()
+    return render(request, "forum/question/new_question.html", {'form': form, 'tags': tags})

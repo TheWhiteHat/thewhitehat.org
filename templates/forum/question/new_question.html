@@ -7,39 +7,27 @@
 {% block body %}
 <div class="span12">
 
+    {% load add_class %}
     <div class="row">
         <h1>Post a new question</h1>
         <form action="{% url 'new_question' %}" method="POST" class="form-horizontal well">
             <h1>{{ form.non_field_error }}</h1>
-            <h1>{{ form.errors }}</h1>
-            {% for error in form.errors %}
-            <h1>{{ error }}</h1>
-            {% endfor %}
             {% csrf_token %}
-            <div class="control-group">
-                <label class="control-label" for="question_text">Question</label>
-                <div class="controls">
-                    <input type="text" class="input-xxlarge" name="question_text" placeholder="Be clear and concise..." />
+            {% for f in form %}
+                <div class="control-group">
+                    {% for error in f.errors %}
+                        <div class="alert alert-error">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                    {{ f.label_tag|add_class:"control-label"|safe }}
+                    <div class="controls">
+                        {{ f|add_class:"input-xxlarge"|safe }}
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
             <div class="control-group">
-                <label for="body_text" class="control-label">Details</label>
-                <div class="controls">
-                    <textarea  class="input-xxlarge" name="body_text" rows="15" ></textarea>
-                </div>
-            </div>
-            <div class="control-group">
-                <label for="tags" class="control-label">Tags</label>
-                <div class="controls">
-                    <input type="text" name="tags" placeholder="Type & hit Enter" class="tagManager"/>
-                </div>
-            </div>
-            <div class="control-group">
-                <div class="controls">
-                    <input type="submit" value="submit" class="btn"/>
-                </div>
-            </div>
-                <br/>
+                <div class="controls"><input type="submit" class="btn" value="Submit" /></div>
             </div>
         </form>
     </div>
@@ -48,7 +36,7 @@
 {% block scripts %}
 <script type="text/javascript" src="/static/js/bootstrap-tagmanager.js"></script>
 <script type="text/javascript">
-jQuery(".tagManager").tagsManager({
+jQuery("#id_tagslist").tagsManager({
     CapitalizeFirstLetter: true,
     preventSubmitOnEnter: true,
     typeahead: true,
