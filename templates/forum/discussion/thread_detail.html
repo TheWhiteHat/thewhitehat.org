@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ thread.subject }}{% endblock %}
+{% block head %}
+<link type="text/css" rel="stylesheet" href="/static/css/thread.css"></link>
+{% endblock %}
+{% block body %}
+<h1>{{ thread.subject }}</h1>
+{% for reply in replies %}
+    <p>{{ reply.body_html }}</p>
+    <p>by {{ reply.author.username }}</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block head %}
+<link href="/static/css/forum.css" rel="stylesheet" type="text/css"/>
+{% endblock %}
+{% block title %}Discussions{% endblock %}
+
+{% block body %}
+<div class="row">
+<div class="span10">
+<ul class="breadcrumb">
+  <li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
+  <li class="active">Discussions</li>
+</ul>
+  <table class="table table-striped">
+    <thead>
+        <tr>
+            <th width="10%">Class</th>
+            <th width="50%">Subject</th>
+            <th width="10%">Preview</th>
+            <th width="10%">Stats</th>
+            <th width="20%">Last Reply</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for thread in threads %}
+        <tr>
+            <td>
+                icon
+            </td>
+            <td>
+                <a class="thread-subject" href="{{ thread.get_absolute_url }}">{{ thread.subject }}</a><br />
+                <span class="thread-date-posted">{{ thread.date_posted }}</span>
+            </td>
+            <td>
+                <a class="btn" title="Preview"><i class="icon-arrow-down"></i></a>
+            </td>
+            <td>
+                <span class="thread-stats">{{ thread.replies_count }} replies</span><br/>
+                <span class="thread-stats">{{ thread.views_count }} views</span><br/>
+            </td>
+            <td>
+                last reply lol
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+<div class="span2">
+    <a class="btn btn-primary" href="{% url 'new_discussion' %}">New Thread</a>
+</div>
+</div>
+{% endblock %}
