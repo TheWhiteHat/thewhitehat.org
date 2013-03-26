@@ -8,7 +8,7 @@
 <div class="span10">
 <ul class="breadcrumb">
   <li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
-  <li><a href="{% url 'question_index' 1 %}">Questions</a> <span class="divider">/</span></li>
+  <li><a href="{% url 'question_list' 1 %}">Questions</a> <span class="divider">/</span></li>
   <li class="active">{{ question.question_text }}</li>
 </ul>
     <div class="row">
