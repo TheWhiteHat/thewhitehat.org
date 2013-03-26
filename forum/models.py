@@ -9,7 +9,7 @@ import datetime
 from django import forms
 from forum.utils import render_markdown
 from django.conf import settings
-
+from mptt.models import MPTTModel, TreeForeignKey
 
 class Vote(models.Model):
     """An vote in a direction, on any object"""
@@ -132,16 +132,20 @@ class EditForm(forms.Form):
     objtype = forms.CharField()
 
 
-class DiscussionBoard(models.Model):
+class Board(models.Model):
+    """A board with a specific category of topics"""
     name = models.CharField(max_length=26)
     slug = models.SlugField()
     description = models.CharField(max_length=100)
     date_created = models.DateTimeField(auto_now_add=True)
-    thread_count = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return self.name
 
 
 class ThreadIcon(models.Model):
-    """An icon for a thread, might be useful for labelling moods of a thread"""
+    """An icon for a discussion, might be useful for labelling
+    moods of a thread"""
     name = models.CharField(max_length=26)
     icon = models.FilePathField(path=settings.STATIC_ROOT)
 
@@ -152,12 +156,11 @@ class ThreadIcon(models.Model):
 class Thread(models.Model):
     """A discussion thread"""
     subject = models.CharField(max_length=300)
-    board = models.ForeignKey(DiscussionBoard)
+    board = models.ForeignKey(Board)
     slug = models.SlugField()
     author = models.ForeignKey(User)
     date_created = models.DateTimeField(auto_now=True)
     posts_count = models.IntegerField(default=0)
-    replies_count = models.IntegerField(default=0)
     views_count = models.IntegerField(default=0)
     date_posted = models.DateTimeField(auto_now=True)
     is_sticky = models.BooleanField(default=False)
@@ -167,17 +170,29 @@ class Thread(models.Model):
         return self.subject
 
     def get_absolute_url(self):
-        return reverse('discussion_detail', args=(self.slug,))
+        return reverse('thread_detail', args=(self.slug,1,))
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            now = datetime.datetime.now()
+            self.slug = slugify(
+                self.subject)[0:37] + now.strftime("%m%d%Y%M%S")
+
+        super(Thread, self).save(*args, **kwargs)
 
 
-class Post(Votable):
-    """A post in a  discussion thread"""
+
+class Post(MPTTModel,Votable):
+    """A post in a  discussion thread. Tree structured."""
     thread = models.ForeignKey(Thread)
     author = models.ForeignKey(User)
     date_posted = models.DateTimeField(auto_now=True)
     date_edited = models.DateTimeField(auto_now=True)
     body_markdown = models.TextField()
     body_html = models.TextField()
+
+    #for tree organization, don't modify
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
 
     def __init__(self, *args, **kwargs):
         # create a reference for detecting if markdown was changed.
@@ -186,7 +201,7 @@ class Post(Votable):
         self._old_body_md = self.body_markdown
 
     def __unicode__(self):
-        return "Post by "+self.author.username+" in  "+self.thread.subject
+        return "Post "+str(self.id)+" by "+self.author.username+" in  "+self.thread.subject
 
     def get_absolute_url(self):
         return reverse('post_detail', args=(self.id,))
@@ -208,9 +223,28 @@ class Post(Votable):
 
         super(Post, self).delete(*args, **kwargs)
 
-class NewDiscussionForm(forms.Form):
-    """A form for posting a new discussion to the discussions site"""
-    discussion_subject = forms.CharField(label="Subject",
+
+class BoardField(forms.CharField):
+    """A field to make sure that the board exists."""
+    def clean(self,value):
+        super(BoardField,self).clean(value)
+        try:
+            Board.objects.get(id=value)
+            return value
+        except Board.DoesNotExist:
+            raise forms.ValidationError("Invalid Board Id.")
+
+class NewThreadForm(forms.Form):
+    """A form for posting a new thread to board """
+    thread_subject = forms.CharField(label="Subject",
                                     initial="Be clear and concise..."
                                    )
     body_text = forms.CharField(widget=forms.Textarea, label="Details")
+    board_id = BoardField()
+    thread_icon = forms.CharField()
+
+
+class NewPostForm(forms.Form):
+    """A form for replying to a or post."""
+    body_text = forms.CharField(widget=forms.Textarea)
+    reply_to = forms.IntegerField(widget=forms.HiddenInput)

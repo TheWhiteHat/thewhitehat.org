@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import simplejson as json
 from whauth.models import User
 from forum.models import Vote, Question, Answer, SubmitAnswerForm, \
-    NewQuestionForm, Thread, Post
+    NewQuestionForm, Thread, Post, Board
 from blog.models import Tag
 from django.db.models import Q
 from django.template.defaultfilters import slugify
@@ -216,13 +216,22 @@ def new_question(request):
 #    """ handle an AJAX edit"""
 #    if request.method is not "POST":
 #
+def board_list(request):
+    """Lists discussion boards."""
+    boards = DiscussionBoard.objects.all()
+    return render(request,"forum/discussion/board_list.html",{"boards":boards})
 
-def discussion_list(request, page_number, **kwargs):
+
+def thread_list(request, page_number, **kwargs):
+    """Lists discussion threads, with optional board filter."""
+
     threads = Thread.objects.select_related(
     ).order_by('-date_posted').all()
+    filtered = False
 
     if 'board_slug' in kwargs:
         threads = threads.filter(board__slug=kwargs['board_slug'])
+        filtered = True
 
     # page these threads
     paginator = Paginator(threads, 10)
@@ -235,39 +244,55 @@ def discussion_list(request, page_number, **kwargs):
     except EmptyPage:
         thread_list = paginator.page(paginator.num_pages)
     return render(request,
-                  'forum/discussion/discussion_list.html',
-                  {'threads': thread_list}
+                  'forum/discussion/thread_list.html',
+                  {'threads': thread_list,'filtered':filtered}
                   )
 
-def discussion_detail(request, thread_slug):
+def thread_detail(request, page_number, thread_slug):
     thread = get_object_or_404(Thread, slug=thread_slug)
-    # TODO: page replies.
-    replies = Post.objects.filter(thread=thread)
+    replies = Post.objects.filter(thread=thread).select_related()
+
+    # page these replies
+    #paginator = Paginator(replies, 10)
+    #if page_number == '':
+    #    page_number = 1
+    #try:
+    #    replies_list = paginator.page(page_number)
+    #except PageNotAnInteger:
+    #    replies_list = paginator.page(1)
+    #except EmptyPage:
+    #    replies_list = paginator.page(paginator.num_pages)
+
     return render(request, "forum/discussion/thread_detail.html",
                   {"thread": thread, "replies": replies}
                   )
 
 @login_required
-def new_discussion(request):
+def new_thread(request):
     if request.method == 'POST':
-        form = NewDiscussionForm(request.POST)
+        form = NewThreadForm(request.POST)
         if form.is_valid():
-            question = Question()
-            question.body_markdown = form.cleaned_data['body_text']
-            question.question_text = form.cleaned_data['question_text']
-            question.author = request.user
-            question.save()
+            thread = Thread()
+            thread.subject = form.cleaned_data['subject_text']
+            thread.board = DiscussionBoard.objects.get(
+                    id = form.cleaned_data['board_id']
+                    )
+            thread.author = request.user
+            thread.save()
 
-            tags = form.cleaned_data['tagslist'].split(",")
-            for tag in tags:
-                tag_name = slugify(tag)
-                tag_object, created = Tag.objects.get_or_create(name=tag_name)
-                question.tags.add(tag_object)
+            post = Post()
+            post.body_markdown = form.cleaned_data['body_text']
+            post.subject = form.cleaned_data['thread_subject']
+            post.author = request.user
+            post.save()
 
-            question.save()
-            return HttpResponseRedirect(reverse('question_detail', kwargs={'slug': question.slug}))
+            post.save()
+            return HttpResponseRedirect(reverse('thread_detail', 
+                    kwargs={'thread_slug': thread.slug}
+                    ))
     else:
-        form = NewQuestionForm()
+        form = NewThreadForm()
 
-    tags = Tag.objects.all()
-    return render(request, "forum/question/new_question.html", {'form': form, 'tags': tags})
+    return render(request, "forum/discussion/new_thread.html",
+            {'form': form}
+            )

@@ -1,12 +1,31 @@
 {% extends "base.html" %}
 {% block title %}{{ thread.subject }}{% endblock %}
 {% block head %}
-<link type="text/css" rel="stylesheet" href="/static/css/thread.css"></link>
+<link type="text/css" rel="stylesheet" href="/static/css/forum.css"></link>
 {% endblock %}
 {% block body %}
 <h1>{{ thread.subject }}</h1>
-{% for reply in replies %}
-    <p>{{ reply.body_html }}</p>
-    <p>by {{ reply.author.username }}</p>
-{% endfor %}
+{% load mptt_tags %}
+<ul class="unstyled thread-root">
+    {% recursetree replies %}
+        <li>
+            <span class="forum-thread-user-info">
+                <a href="{{ node.author.username }}">{{ node.author.username }}</a> | 
+                {{ node.date_posted }} 
+            </span>
+            <div class="forum-thread-body">
+                {{ node.body_html|safe }}
+            </div>
+            <div class="forum-thread-post-actions">
+                <a href="#">Reply</a> | 
+                <a href="#">Flag</a>
+            </div>
+            {% if not node.is_leaf_node %}
+                <ul class="unstyled thread-reply">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endrecursetree %}
+</ul>
 {% endblock %}

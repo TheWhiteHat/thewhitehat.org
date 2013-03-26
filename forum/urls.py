@@ -11,9 +11,9 @@ urlpatterns = patterns('forum.views',
     url(r'^question/new/$','new_question',name='new_question'),
 
     # discussion urls
-    url(r'^discussion/(?P<page_number>\d*)$','discussion_list',name='discussion_list'),
-    url(r'^discussion/board/(?P<board_slug>[A-Za-z0-9-]*)/(?P<page_number>\d*)$','discussion_list',name='discussion_list'),
-    url(r'^discussion/thread/(?P<thread_slug>[A-Za-z0-9-]*)$','discussion_detail',name='discussion_detail'),
-    url(r'^discussion/new/$','new_discussion',name='new_discussion'),
+    url(r'^discussion/(?P<page_number>\d*)$','thread_list',name='thread_list'),
+    url(r'^discussion/board/(?P<board_slug>[A-Za-z0-9-]*)/(?P<page_number>\d*)$','thread_list',name='thread_list'),
+    url(r'^discussion/thread/(?P<thread_slug>[A-Za-z0-9-]*)/(?P<page_number>\d*)$','thread_detail',name='thread_detail'),
+    url(r'^discussion/new/$','new_thread',name='new_thread'),
 
 )

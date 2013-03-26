@@ -1,5 +1,6 @@
 from django.contrib import admin
 from forum.models import *
+from mptt.admin import MPTTModelAdmin
 
 
 class AnswerInline(admin.StackedInline):
@@ -35,4 +36,5 @@ class BoardAdmin(admin.ModelAdmin):
     list_display = ('name','slug','date_created')
     prepopulated_fields = {'slug': ('name',)}
 
-admin.site.register(DiscussionBoard, BoardAdmin)
+admin.site.register(Board, BoardAdmin)
+admin.site.register(Post, MPTTModelAdmin)
