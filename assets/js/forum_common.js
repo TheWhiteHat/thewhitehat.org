@@ -5,3 +5,6 @@ function show_error(msg){
 function show_success(msg){
     $("#info").prepend("<div class='alert alert-success'>"+msg+"<a href='#' class='close' data-dismiss='alert'>&times;</a></div>").show();
 };
+jQuery.fn.edit= function(objtype,objid){
+    //todo: write edit handler.
+}

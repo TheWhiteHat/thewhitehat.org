@@ -128,11 +128,15 @@ def handle_vote(request):
                 return json_error("object_does_not_exist")
 
         # handle a vote on an answer
-        if object_type == 'answer':
+        elif object_type == 'answer':
             try:
                 obj = Answer.objects.get(id=int(object_id))
             except Answer.DoesNotExist:
                 return json_error("object_does_not_exist")
+
+        # invalid object
+        else:
+            return json_error("invalid_vote")
 
         # vote on the object
         try:
@@ -211,11 +215,101 @@ def new_question(request):
     tags = Tag.objects.all()
     return render(request, "forum/question/new_question.html", {'form': form, 'tags': tags})
 
-#@login_required
-# def handle_edit(request):
-#    """ handle an AJAX edit"""
-#    if request.method is not "POST":
-#
+
+def validate_edit_request(objid, objtype, body_text):
+    return is_int(objid) and (objtype != "") and (body_text != "")
+
+
+def get_edit_object(object_id, object_type):
+    # they are editing a forum post
+    if object_type == "post":
+        try:
+            return Post.objects.get(id=int(object_id))
+        except Post.DoesNotExist:
+            return None
+
+    # they are editing a question
+    elif object_type == "question":
+        try:
+            return Question.objects.get(id=int(object_id))
+        except Question.DoesNotExist:
+            return None
+
+    # they are editing a question answer
+    elif object_type == "answer":
+        try:
+            return Answer.objects.get(id=int(object_id))
+        except Answer.DoesNotExist:
+            return None
+
+    # they are h4x0r
+    else:
+        return None
+
+@login_required
+def handle_edit(request):
+    """ handle an AJAX edit for post, question, or answer."""
+
+    # they are requesting an edit, send text to edit.
+    if request.method == "GET":
+       object_id = object_type = None
+
+       try:
+           object_id = request.GET['objid']
+           object_type = request.GET['objtype']
+       except KeyError:
+           return json_error("invalid_request")
+
+       # validate their request
+       if not is_int(object_id) or (object_type == ""):
+           return json_error("invalid_request")
+
+       obj = get_edit_object(object_id, object_type)
+
+       if obj is None:
+           return json_error("object_does_not_exist")
+
+       if obj.author != request.user:
+           return json_error("not_author")
+
+       return json_success(obj.body_markdown)
+
+
+    # they are submitting an edit
+    if request.method == "POST":
+        if not request.is_ajax():
+            return json_error("invalid_request")
+
+        #parse what object they're modifying.
+        object_id = object_type = body_text = None
+
+        try:
+            object_id = request.POST['objid']
+            object_type = request.POST['objtype']
+            body_text = request.POST['body_text']
+        except KeyError:
+            return json_error("invalid_request")
+
+       # make sure the request is valid
+        if not validate_edit_request(object_id, object_type, body_text):
+            return json_error("invalid_request")
+
+        obj = get_edit_object(object_id, object_type)
+
+        if obj is None:
+            return json_error("object_does_not_exist")
+
+        if obj.author != request.user:
+            return json_error("not_author")
+
+        # apply edit
+        try:
+            obj.body_markdown = body_text
+            obj.save()
+            return json_success(obj.body_html)
+        except:
+            json_error("save_error")
+
 def board_list(request):
     """Lists discussion boards."""
     boards = DiscussionBoard.objects.all()
@@ -253,6 +347,7 @@ def thread_detail(request, page_number, thread_slug):
     replies = Post.objects.filter(thread=thread).select_related()
 
     # page these replies
+    # TODO: paging breaks the tree structure for some reason.
     #paginator = Paginator(replies, 10)
     #if page_number == '':
     #    page_number = 1

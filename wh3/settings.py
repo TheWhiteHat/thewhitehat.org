@@ -14,6 +14,10 @@ AUTH_USER_MODEL = 'whauth.User'
 AUTHENTICATION_BACKENDS = (
         'whauth.backends.AuthBackend',
         )
+LOGIN_REDIRECT_URL = "login"
+LOGIN_URL = "login"
+LOGOUT_URL = "logout"
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

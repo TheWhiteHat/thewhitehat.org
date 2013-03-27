@@ -31,6 +31,11 @@
     <div class="row">
         <div class="span9 offset1">
             {{ question.body_html|safe }}
+            {% if question.author.id == user.id %}
+            <div class="edit-question">
+                <a class="btn btn-small" onclick="$(this).edit('question','{{ question.id }}');"><i class="icon-pencil"></i> Edit</a>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="row">

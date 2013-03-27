@@ -10,10 +10,16 @@ from forum.views import json_error, json_success
 
 
 def login(request):
+    try:
+        next_url = request.GET['next']
+    except:
+        next_url = "/"
+
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/')  # to a logged in page
+        return HttpResponseRedirect(next_url)
 
     if request.method == "GET":
+
         f = AuthBackend()
 
         if 'token' in request.GET:
@@ -22,13 +28,14 @@ def login(request):
 
             if user:
                 djlogin(request, user)
-                return HttpResponseRedirect('/')  # to a logged in page
+                return HttpResponseRedirect(next_url)
             else:
-                return render(request, "whauth/login.html", {'error': "Error on fb login. Either you aren't registered or facebook is tripping."})  # to a fb login error page
+                return render(request, "whauth/login.html", {'error': "Error on fb login. Either you aren't registered or facebook is tripping."})
 
     elif request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
+        next_url = request.POST['next']
 
         f = AuthBackend()
 
@@ -36,11 +43,11 @@ def login(request):
 
         if user:
             djlogin(request, user)
-            return HttpResponseRedirect('/')  # to a logged in page
+            return HttpResponseRedirect(next_url)
         else:
-            return render(request, "whauth/login.html", {'error': "Error on login. Either you aren't registered or invalid password."})  # to a fb login error page
+            return render(request, "whauth/login.html", {'error': "Error on login. Either you aren't registered or invalid password."})
 
-    return render(request, 'whauth/login.html')
+    return render(request, 'whauth/login.html',{"next_url":next_url})
 
 
 def logouts(request):
@@ -73,3 +80,4 @@ def register(request):
     else:
         form = NewUserForm()
     return render(request, "whauth/register.html", {'form': form})
+
