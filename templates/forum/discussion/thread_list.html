@@ -8,13 +8,18 @@
 <div class="row">
 <div class="span10">
 <ul class="breadcrumb">
-  <li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
-  <li class="active">Discussions</li>
+<li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
+{% if filtered %}
+<li><a href="{% url 'thread_list' 1 %}">Discussions</a> <span class="divider">/</span></li>
+<li class="active">{{ filtered}}</li>
+{% else %}
+<li class="active">Discussions</li>
+{% endif %}
 </ul>
   <table class="table table-striped">
     <thead>
         <tr>
-            <th width="10%">Class</th>
+            <th width="10%">Mood</th>
             <th width="50%">Subject</th>
             <th width="10%">Preview</th>
             <th width="10%">Stats</th>
@@ -25,7 +30,7 @@
     {% for thread in threads %}
         <tr>
             <td>
-                icon
+                <img src="{{ thread.icon.icon }}"/>
             </td>
             <td>
                 <a class="thread-subject" href="{{ thread.get_absolute_url }}">{{ thread.subject }}</a><br />
@@ -47,7 +52,16 @@
     </table>
 </div>
 <div class="span2">
-    <a class="btn btn-primary" href="{% url 'new_thread' %}">New Thread</a>
+{% if filtered %}
+    <a class="btn btn-primary" href="{% url 'new_thread' filtered|slugify %}">New Thread</a>
+{% else %}
+    <ul class="nav nav-list">
+    <li class="nav-header">Boards</li>
+    {% for board in boards %}
+       <li><a href="{{ board.get_absolute_url }}">{{ board.name }}</a></li>
+    {% endfor %}
+    <ul>
+{% endif %}
 </div>
 </div>
 {% endblock %}

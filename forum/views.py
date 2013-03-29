@@ -1,11 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import simplejson as json
 from whauth.models import User
 from forum.models import Vote, Question, Answer, SubmitAnswerForm, \
-    NewQuestionForm, Thread, Post, Board
+    NewQuestionForm, Thread, Post, Board, NewThreadForm, ThreadIcon,\
+    NewPostForm
 from blog.models import Tag
 from django.db.models import Q
 from django.template.defaultfilters import slugify
@@ -319,13 +320,19 @@ def board_list(request):
 def thread_list(request, page_number, **kwargs):
     """Lists discussion threads, with optional board filter."""
 
-    threads = Thread.objects.select_related(
-    ).order_by('-date_posted').all()
-    filtered = False
+    threads = Thread.objects.select_related('author','icon').order_by(
+            '-date_posted').all()
+    filtered = None
 
     if 'board_slug' in kwargs:
-        threads = threads.filter(board__slug=kwargs['board_slug'])
-        filtered = True
+        board = get_object_or_404(Board,slug=kwargs['board_slug'])
+        threads = get_list_or_404(threads.filter(board=board))
+        filtered = board.name
+
+    if filtered is None:
+        boards = Board.objects.all()
+    else:
+        boards = None
 
     # page these threads
     paginator = Paginator(threads, 10)
@@ -339,7 +346,7 @@ def thread_list(request, page_number, **kwargs):
         thread_list = paginator.page(paginator.num_pages)
     return render(request,
                   'forum/discussion/thread_list.html',
-                  {'threads': thread_list,'filtered':filtered}
+                  {'threads': thread_list,'filtered':filtered, 'boards':boards}
                   )
 
 def thread_detail(request, page_number, thread_slug):
@@ -363,19 +370,22 @@ def thread_detail(request, page_number, thread_slug):
                   )
 
 @login_required
-def new_thread(request):
+def new_thread(request,board_slug):
     if request.method == 'POST':
         form = NewThreadForm(request.POST)
         if form.is_valid():
             thread = Thread()
-            thread.subject = form.cleaned_data['subject_text']
-            thread.board = DiscussionBoard.objects.get(
+            thread.subject = form.cleaned_data['thread_subject']
+            thread.board = Board.objects.get(
                     id = form.cleaned_data['board_id']
                     )
             thread.author = request.user
+            icon_id = form.cleaned_data['thread_icon']
+            thread.icon = ThreadIcon.objects.get(id=icon_id)
             thread.save()
 
             post = Post()
+            post.thread = thread
             post.body_markdown = form.cleaned_data['body_text']
             post.subject = form.cleaned_data['thread_subject']
             post.author = request.user
@@ -383,11 +393,32 @@ def new_thread(request):
 
             post.save()
             return HttpResponseRedirect(reverse('thread_detail', 
-                    kwargs={'thread_slug': thread.slug}
+                    kwargs={'thread_slug': thread.slug,'page_number':1}
                     ))
     else:
+        board = get_object_or_404(Board,slug=board_slug)
+        icons = ThreadIcon.objects.all()
         form = NewThreadForm()
 
     return render(request, "forum/discussion/new_thread.html",
-            {'form': form}
+            {'form': form,'board':board,'icons':icons}
             )
+
+@login_required
+def handle_reply(request):
+    """Handle a reply to a post"""
+    if request.method == 'POST':
+        form = NewPostForm(request.POST)
+        if form.is_valid():
+            parent = Post.objects.get(id=form.cleaned_data['reply_to'])
+            post = Post()
+            post.parent = parent
+            post.thread = parent.thread
+            post.author = request.user
+            post.body_markdown = form.cleaned_data['body_text']
+            post.save()
+
+            return json_success(post.body_html)
+        else:
+            return json_error("invalid_request")
+

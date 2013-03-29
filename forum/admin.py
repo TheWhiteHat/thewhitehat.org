@@ -38,3 +38,15 @@ class BoardAdmin(admin.ModelAdmin):
 
 admin.site.register(Board, BoardAdmin)
 admin.site.register(Post, MPTTModelAdmin)
+
+class ThreadIconAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    fieldsets = (
+            ("Name for mood/icon", {
+                'fields':('name',)
+            }),
+            ('Icon filename: insert filename after directory.',{
+                'fields':('icon',)
+            }),
+    )
+admin.site.register(ThreadIcon, ThreadIconAdmin)

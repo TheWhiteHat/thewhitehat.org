@@ -142,12 +142,16 @@ class Board(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse("thread_list",args=(self.slug,1))
+
 
 class ThreadIcon(models.Model):
     """An icon for a discussion, might be useful for labelling
     moods of a thread"""
     name = models.CharField(max_length=26)
-    icon = models.FilePathField(path=settings.STATIC_ROOT)
+    icon = models.CharField(max_length=100,
+            default="/static/img/thread-icons/")
 
     def __unicode__(self):
         return self.name
@@ -189,7 +193,7 @@ class Post(MPTTModel,Votable):
     date_posted = models.DateTimeField(auto_now=True)
     date_edited = models.DateTimeField(auto_now=True)
     body_markdown = models.TextField()
-    body_html = models.TextField()
+    body_html = models.TextField(blank=True)
 
     #for tree organization, don't modify
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
@@ -234,17 +238,41 @@ class BoardField(forms.CharField):
         except Board.DoesNotExist:
             raise forms.ValidationError("Invalid Board Id.")
 
+class IconField(forms.IntegerField):
+    """A field to make sure that the icon exists."""
+    def clean(self,value):
+        super(IconField,self).clean(value)
+        if value == 0:
+            return None
+        try:
+            ThreadIcon.objects.get(id=value)
+            return value
+        except ThreadIcon.DoesNotExist:
+            raise forms.ValidationError("Invalid Icon Id.")
+
 class NewThreadForm(forms.Form):
     """A form for posting a new thread to board """
     thread_subject = forms.CharField(label="Subject",
                                     initial="Be clear and concise..."
                                    )
     body_text = forms.CharField(widget=forms.Textarea, label="Details")
-    board_id = BoardField()
-    thread_icon = forms.CharField()
+    board_id = BoardField(widget=forms.HiddenInput)
+    thread_icon = IconField()
+
+
+
+class PostField(forms.IntegerField):
+    """A field to make sure that a post exists"""
+    def clean(self,value):
+        super(PostField,self).clean(value)
+        try:
+            Post.objects.get(id=value)
+            return value
+        except Post.DoesNotExist:
+            raise forms.ValidationError("Invalid post id.")
 
 
 class NewPostForm(forms.Form):
     """A form for replying to a or post."""
     body_text = forms.CharField(widget=forms.Textarea)
-    reply_to = forms.IntegerField(widget=forms.HiddenInput)
+    reply_to = PostField(widget=forms.HiddenInput)

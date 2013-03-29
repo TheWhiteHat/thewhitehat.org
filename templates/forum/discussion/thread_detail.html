@@ -4,11 +4,19 @@
 <link type="text/css" rel="stylesheet" href="/static/css/forum.css"></link>
 {% endblock %}
 {% block body %}
+<div class="row">
+<div class="span12">
+<ul class="breadcrumb">
+  <li><a href="{% url 'forum_index' %}">Forum Home</a> <span class="divider">/</span></li>
+  <li><a href="{% url 'thread_list' 1 %}">Discussions</a> <span class="divider">/</span></li>
+  <li><a href="{% url 'thread_list' thread.board.slug 1 %}">{{ thread.board.name }}</a> <span class="divider">/</span></li>
+  <li class="active">{{ thread.subject }}</li>
+</ul>
 <h1>{{ thread.subject }}</h1>
 {% load mptt_tags %}
 <ul class="unstyled thread-root">
     {% recursetree replies %}
-        <li>
+        <li id="post-{{ node.id }}">
             <span class="forum-thread-user-info">
                 <a href="{{ node.author.username }}">{{ node.author.username }}</a> | 
                 {{ node.date_posted }} 
@@ -17,8 +25,8 @@
                 {{ node.body_html|safe }}
             </div>
             <div class="forum-thread-post-actions">
-                <a href="#">Reply</a> | 
-                <a href="#">Flag</a>
+                <a onclick="$(this).show_reply_form('{{ node.id }}');">Reply</a> | 
+                <a href="#">Derp</a>
             </div>
             {% if not node.is_leaf_node %}
                 <ul class="unstyled thread-reply">
@@ -28,4 +36,22 @@
         </li>
     {% endrecursetree %}
 </ul>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+var csrf_token = "{{ csrf_token }}";
+var reply_handler = "{% url 'handle_reply' %}";
+</script>
+<link href="/static/css/prettyprint/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/static/js/prettyprint/prettify.js"></script>
+<script type="text/javascript" src="/static/js/thread_detail.js"></script>
+<script>
+!function ($) {
+  $(function(){
+  window.prettyPrint && prettyPrint()   
+  })
+}(window.jQuery);
+</script>
 {% endblock %}

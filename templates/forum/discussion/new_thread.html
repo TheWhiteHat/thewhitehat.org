@@ -8,23 +8,44 @@
 
     {% load add_class %}
     <div class="row">
-        <h1>Post a new question</h1>
-        <form action="{% url 'new_thread' %}" method="POST" class="form-horizontal well">
+        <h1>Start a new Thread</h1>
+        <form action="{% url 'new_thread' board.slug %}" method="POST" class="form-horizontal well">
             <h1>{{ form.non_field_errors }}</h1>
             {% csrf_token %}
-            {% for f in form %}
-                <div class="control-group">
-                    {% for error in f.errors %}
-                        <div class="alert alert-error">
-                            {{ error }}
-                        </div>
-                    {% endfor %}
-                    {{ f.label_tag|add_class:"control-label"|safe }}
-                    <div class="controls">
-                        {{ f|add_class:"input-xxlarge"|safe }}
+            <div class="control-group">
+                {% for error in form.thread_subject.errors %}
+                    <div class="alert alert-error">
+                        {{ error }}
                     </div>
+                {% endfor %}
+                <label for="thread_subject" class="control-label">Subject</label>
+                <div class="controls">
+                    <input type="text" class="input-xxlarge" placeholder="Be clear and concise..." name="thread_subject"/>
                 </div>
-            {% endfor %}
+            </div>
+            <div class="control-group">
+                {% for error in form.body_text.errors %}
+                    <div class="alert alert-error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+                <label for="body_text" class="control-label">Body</label>
+                <div class="controls">
+                    <textarea class="input-xxlarge" name="body_text"></textarea>
+                </div>
+            </div>
+            <input type="hidden" name="board_id" value="{{ board.id }}"/>
+            <div class="control-group">
+                <label for="thread_icon" class="control-label">Mood</label>
+                <div class="controls">
+                    <select name="thread_icon">
+                        <option value="0">None</option>
+                        {% for icon in icons %}
+                            <option value="{{icon.id}}"><img width="21px" height="21px" src="{{ icon.icon }}"/> {{ icon.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="control-group">
                 <div class="controls"><input type="submit" class="btn" value="Submit" /></div>
             </div>
