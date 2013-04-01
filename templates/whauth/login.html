@@ -29,7 +29,7 @@
 function login() {
 FB.getLoginStatus(function(response) {
     if (response.status === 'connected') {
-          window.location = "{% url 'login' %}?token="+response.authResponse.accessToken+"&next="+{{ next_url}};
+          window.location = "{% url 'login' %}?token="+response.authResponse.accessToken+"&next={{ next_url}}";
     } else if (response.status === 'not_authorized') {
       fblogin();
     } else {
