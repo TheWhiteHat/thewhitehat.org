@@ -43,23 +43,27 @@ jQuery.fn.reply = function(replyid){
                 else
                 {
                     console.log("success");
-                    $("#replybox-"+replyid).remove();
+                    obj.hide_reply_form(replyid);
                     var replies = $("#post-"+replyid).has("ul");
                     console.log(replies);
                     if(replies.length){
-                        console.log("does not have replies");
-                        $(replies).append("\
+                        console.log("has replies");
+                        $(replies).children("ul").append("\
+                        <li style='display:none;' id='replyto-"+replyid+"'>\
                         <span class='forum-thread-user-info'>You Said:</span>\
                         <div class='forum-thread-body'>"+response.message+"</div>\
                         </li>");
                     }else{
                         console.log("does not have replies");
                         $("#post-"+replyid).append("\
-                        <ul class='unstyled thread-reply'><li>\
+                        <ul class='unstyled thread-reply'>\
+                        <li style='display:none;' id='replyto-"+replyid+"'>\
                         <span class='forum-thread-user-info'>You Said:</span>\
                         <div class='forum-thread-body'>"+response.message+"</div>\
                         </li></ul>");
                     }
+                    window.location.hash = "replyto-"+replyid;
+                    $("#replyto-"+replyid).slideDown();
                 }
             });
         })(this,replyid);
