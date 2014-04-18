@@ -1,7 +1,5 @@
 django==1.5
 dj-database-url==0.2.1
-psycopg2==2.4.5
-py-bcrypt==0.2
 markdown
 django-mptt
 django-debug-toolbar
